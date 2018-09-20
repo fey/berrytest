@@ -10,10 +10,12 @@ class App
     {
         $uri = $this->getUri();
         $method = $this->getMethod();
-
         $response = $this->routes[$uri][$method];
-
-        echo $response();
+        if ($response) {
+            echo $response();
+        } else {
+            echo '404';
+        }
     }
 
     public function get($path, $handler)
