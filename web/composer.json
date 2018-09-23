@@ -1,4 +1,5 @@
 {
+    "description": "my test work",
     "name": "fey/berrytest",
     "type": "project",
     "authors": [
@@ -13,5 +14,7 @@
             "": "src/"
         }
     },
-    "require": {}
+    "require": {
+        "php": ">=7.2.0"
+    }
 }
