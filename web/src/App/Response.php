@@ -64,4 +64,20 @@ class Response implements ResponseInterface
             return "$key: $value";
         }, array_keys($this->headers), $this->headers);
     }
+
+    public function sendHeaders()
+    {
+        foreach ($this->getHeaderLines() as $header) {
+            header($header);
+        }
+
+        return $this;
+    }
+
+    public function sendResponseCode()
+    {
+        http_response_code($this->getStatusCode());
+
+        return $this;
+    }
 }
