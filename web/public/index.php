@@ -2,34 +2,17 @@
 
 namespace App;
 
-error_reporting(E_ALL & ~E_NOTICE);
-if (PHP_SAPI == 'cli-server') {
-    // To help the built-in PHP dev server, check if the request was actually for
-    // something which should probably be served as a static file
-    $url = parse_url($_SERVER['REQUEST_URI']);
-    $file = __DIR__.$url['path'];
-    if (is_file($file)) {
-        return false;
-    }
-}
-var_dump($_SERVER);
-require_once __DIR__.'/../vendor/autoload.php';
+require_once '../vendor/autoload.php';
+use function App\Renderer\render;
 
-$app = new App();
+$app = new Application();
 
-$app->get('/companies', function () {
-    return 'companies list';
+$app->get('', function ($meta, $params, $attributes, $cookies, $session) {
+    $session->start();
+    $nickname = $session->get('nickname');
+
+    return response(render('index', ['nickname' => $nickname]));
 });
-
-$app->post('/companies', function () {
-    return 'company was created';
-});
-
-$app->get('/', function () {
-    return 'Index Page';
-});
-
-$app->get('/about', function () {
-    return 'About';
-});
+$app->get('/test', '\App\Controller\Test::index');
+$app->get('/test/:id', '\App\Controller\Test::getUser');
 $app->run();
