@@ -12,7 +12,12 @@
     "autoload": {
         "psr-4": {
             "": "src/"
-        }
+        },
+        "files": [
+            "src/App/Response.php",
+            "src/App/Renderer/Renderer.php",
+            "src/App/Template/Template.php"
+        ]
     },
     "require": {
         "php": ">=7.2.0"
