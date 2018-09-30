@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div>
+            <?php if ($nickname) : ?>
+                <h3>hello, <?= $nickname; ?></h3>
+                <form method="post" class="session-delete" action="/session">
+                    <input type="hidden" name="_method" value="delete" />
+                    <input type="submit" value="Sign Out" />
+                </form>
+            <?php else : ?>
+                <h3>please, sign in</h3>
+                <a class="session-new" href="/session/new">Sign in</a>
+            <?php endif; ?>
+        </div>
+    </body>
+</html>
