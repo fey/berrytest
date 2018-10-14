@@ -80,4 +80,16 @@ class Response implements ResponseInterface
 
         return $this;
     }
+
+    public function withCookie($key, $value)
+    {
+        $this->cookies[$key] = $value;
+
+        return $this;
+    }
+
+    public function getCookies()
+    {
+        return $this->cookies;
+    }
 }
