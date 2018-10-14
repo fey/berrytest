@@ -16,7 +16,8 @@
         "files": [
             "src/App/Response.php",
             "src/App/Renderer/Renderer.php",
-            "src/App/Template/Template.php"
+            "src/App/Template/Template.php",
+            "src/utilities.php"
         ]
     },
     "require": {
