@@ -2,6 +2,8 @@
 
 namespace App;
 
+use function App\Renderer\render;
+
 class Application
 {
     public $handlers = [];
@@ -10,20 +12,22 @@ class Application
     {
         $uri = $this->getUri();
         $method = $this->getMethod();
-        [$preparedRoute, $handlerMethod, $handler, $attributes] = $this->getHandlerItem();
 
         $meta = [
-                    'method' => $method,
-                    'uri' => $uri,
-                    'headers' => getallheaders(),
-                ];
+            'method' => $method,
+            'uri' => $uri,
+            'headers' => getallheaders(),
+        ];
 
         $session = new Session();
-
-        $response = $handler($meta, array_merge($_GET, $_POST), $attributes, $_COOKIE, $session);
-        $response->sendResponseCode()->sendHeaders();
-
-        echo $response->getBody();
+        if (!empty($this->getHandlerItem())) {
+            [$preparedRoute, $handlerMethod, $handler, $attributes] = $this->getHandlerItem();
+            $response = $handler($meta, array_merge($_GET, $_POST), $attributes, $_COOKIE, $session);
+            $response->sendResponseCode()->sendHeaders();
+            echo $response->getBody();
+        } else {
+            echo response(render('404'))->withStatus(404)->getBody();
+        }
 
         return;
     }
@@ -47,7 +51,7 @@ class Application
     {
         $url = strtolower(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
-        return rtrim($url, '/');
+        return trim($url);
     }
 
     private function getMethod()
