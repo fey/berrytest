@@ -23,10 +23,9 @@ class Response implements ResponseInterface
 
     public function redirect($url)
     {
-        $this->status = 302;
         $this->headers['Location'] = $url;
 
-        return $this;
+        return $this->withStatus(302);
     }
 
     public function withStatus($status)
