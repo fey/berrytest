@@ -7,22 +7,20 @@ use function App\Renderer\render;
 class Application
 {
     public $handlers = [];
+    public $request;
 
     public function run()
     {
-        $uri = $this->getUri();
-        $method = $this->getMethod();
-
-        $meta = [
-            'method' => $method,
-            'uri' => $uri,
-            'headers' => getallheaders(),
-        ];
+        $this->request = new Request();
+        $uri = $this->request->getUri();
+        $method = $this->request->getMethod();
 
         $session = new Session();
+        $session->start();
         if (!empty($this->getHandlerItem())) {
             [$preparedRoute, $handlerMethod, $handler, $attributes] = $this->getHandlerItem();
-            $response = $handler($meta, array_merge($_GET, $_POST), $attributes, $_COOKIE, $session);
+
+            $response = $handler($this->request, $attributes);
             $response->sendResponseCode()->sendHeaders();
             echo $response->getBody();
         } else {
@@ -73,8 +71,8 @@ class Application
 
     private function getHandlerItem()
     {
-        $uri = $this->getUri();
-        $method = $this->getMethod();
+        $uri = $this->request->getUri();
+        $method = $this->request->getMethod();
 
         return array_reduce($this->handlers, function ($acc, $item) use ($method, $uri) {
             [$route, $handlerMethod, $handler] = $item;
