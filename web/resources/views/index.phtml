@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php 
-use function App\Renderer\render;
 
 ?>
 <head>
@@ -63,7 +62,21 @@ use function App\Renderer\render;
 
     </nav>
     <div class="row content">
-    <?= render('common/pager', ['pages' => $pages]); ?>
+    <nav aria-label="...">
+      <ul class="pager">
+        <?php 
+use function Utilities\isPaged;
+
+if (isPaged($pages['current'], $pages['count'])): ?>
+          <li class="previous"><a href="/page/<?= $pages['current'] - 1; ?>">
+          <span aria-hidden="true">&larr;</span> Older</a></li>
+        <?php endif; ?>
+        <?php if (isPaged($pages['current'] + 1, $pages['count'])): ?>
+        <li class="next"><a href="/page/<?= $pages['current'] + 1; ?>">
+        Newer <span aria-hidden="true">&rarr;</span></a></li>
+        <?php endif; ?>
+      </ul>
+    </nav>
       <!-- SIDEBAR START -->
 
       <!-- END SIDEBAR -->
@@ -97,7 +110,19 @@ use function App\Renderer\render;
 
       </div>
     </div>
-<?= render('common/pager', ['pages' => $pages]); ?>
+    <nav aria-label="...">
+      <ul class="pager">
+        <?php 
+if (isPaged($pages['current'], $pages['count'])): ?>
+          <li class="previous"><a href="/page/<?= $pages['current'] - 1; ?>">
+          <span aria-hidden="true">&larr;</span> Older</a></li>
+        <?php endif; ?>
+        <?php if (isPaged($pages['current'] + 1, $pages['count'])): ?>
+        <li class="next"><a href="/page/<?= $pages['current'] + 1; ?>">
+        Newer <span aria-hidden="true">&rarr;</span></a></li>
+        <?php endif; ?>
+      </ul>
+    </nav>
 
     <footer class="">
       <p>Footer Text</p>
