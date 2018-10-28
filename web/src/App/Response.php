@@ -15,9 +15,6 @@ class Response implements ResponseInterface
 
     public function __construct($body)
     {
-        if (is_string($body)) {
-            $this->headers['Content-Length'] = mb_strlen($body);
-        }
         $this->body = $body;
     }
 
