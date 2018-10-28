@@ -2,6 +2,9 @@
 
 namespace App;
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require_once '../vendor/autoload.php';
 use function App\Renderer\render;
 use Db\Repository;
@@ -10,14 +13,14 @@ $repo = new Repository('articles');
 $app = new Application();
 // $meta, $params, $attributes, $cookies, $session
 $app->get('/debug', function ($request) use ($repo) {
-    return response(var_dump($request->getQueryParams()));
+    return response(var_dump(response('123')->getHeaderLines()));
 });
 
 $app->get('/', function ($request, $attributes) use ($repo) {
     $articles = $repo->getPage();
     $pages = ['current' => 1, 'count' => $repo->count()];
 
-    return response(render('common/index', ['title' => 'Главная страница', 'articles' => $articles, 'pages' => $pages]));
+    return response(render('index', ['title' => 'Главная страница', 'articles' => $articles, 'pages' => $pages]));
 });
 
 $app->get('/page/:page', function ($request, $attributes) use ($repo) {
@@ -27,7 +30,7 @@ $app->get('/page/:page', function ($request, $attributes) use ($repo) {
         return response()->redirect('/');
     }
 
-    return response(render('common/index', ['title' => 'Главная страница', 'articles' => $articles, 'pages' => $pages]));
+    return response(render('index', ['articles' => $articles, 'pages' => $pages]));
 });
 
 $app->get('/new', function ($request) {
@@ -43,7 +46,14 @@ $app->get('/article/:id', function ($request, $attributes) use ($repo) {
 $app->post('/articles', function ($request) use ($repo) {
     $formData = array_map('\Utilities\clean', $request->getQueryParam('article'));
     // $articles->insert
+    $errors = array_filter($formData, function ($value) {
+        return empty($value);
+    });
+    if ($errors) {
+        // return response(var_dump($errors));
 
+        return response(render('articles/new', ['formData' => $formData, 'errors' => $errors]));
+    }
     $repo->insert([
         'description' => $formData['description'],
         'text' => str_replace(PHP_EOL, '</br>', $formData['text']),
