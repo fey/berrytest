@@ -12,7 +12,7 @@ class Request
     public function __construct()
     {
         $this->uri = $this->getUri();
-        $this->headers = \Utilities\getallheaders();
+        $this->headers = getallheaders();
         $this->queryParams = array_merge($_GET, $_POST);
     }
 
