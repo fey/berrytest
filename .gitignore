@@ -3,7 +3,7 @@ composer.phar
 .*
 db/berry.sql
 db/data.sql
-composer.lock
+
 *.log
 .*/
 *.sql
