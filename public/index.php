@@ -21,7 +21,7 @@ $app->get('/session', function ($request) use ($articles, $authors) {
     return response(var_dump(session_id(), $_SESSION, $sessionId, $_COOKIE, $author));
 });
 $app->get('/debug', function ($request) use ($articles) {
-    return response(var_dump(response('123')->getHeaderLines()));
+    return response(var_dump($_ENV));
 });
 
 $app->get('/', function ($request, $attributes) use ($articles, $authors) {
