@@ -21,11 +21,7 @@ $app->get('/session', function ($request) use ($articles, $authors) {
     return response(var_dump(session_id(), $_SESSION, $sessionId, $_COOKIE, $author));
 });
 $app->get('/debug', function ($request) use ($articles) {
-<<<<<<< HEAD
     return response('<pre>'.print_r($_ENV).'</pre>');
-=======
-    return response(var_dump($_ENV));
->>>>>>> 34d66edb9ef425d9a5c45de2b0a396d2df433cce
 });
 
 $app->get('/', function ($request, $attributes) use ($articles, $authors) {
