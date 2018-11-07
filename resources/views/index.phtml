@@ -4,8 +4,11 @@
         <h1>Не создано ни одной новости</h1>
         <?php endif; ?>
         <?php foreach ($articles as $article): ?>
+        <article>
         <?php  include 'article.phtml'; ?>
         <a href="/article/<?= $article['id']; ?>">Читать далее</a>
+        <hr>
+        </article>
         <?php endforeach; ?>
 
       </div>

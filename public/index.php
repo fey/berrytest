@@ -36,7 +36,10 @@ $app->get('/', function ($request, $attributes) use ($articles, $authors) {
     $pages = ['current' => 1, 'count' => $articles->count()];
 
     return response(render('index', [
-        'title' => 'Главная страница', 'articles' => $articlesPerPage, 'pages' => $pages, ]));
+        'title' => 'Главная страница',
+        'articles' => $articlesPerPage,
+        'pages' => $pages,
+        ]));
 });
 //! починить пагинацию
 $app->get('/page/:page', function ($request, $attributes) use ($articles, $authors) {
@@ -51,7 +54,11 @@ $app->get('/page/:page', function ($request, $attributes) use ($articles, $autho
         return response()->redirect('/');
     }
 
-    return response(render('index', ['articles' => $articlesPerPage, 'pages' => $pages, 'title' => "Новости, страница {$attributes['page']}"]));
+    return response(render('index', [
+        'articles' => $articlesPerPage,
+        'pages' => $pages,
+        'title' => "Новости, страница {$attributes['page']}",
+        ]));
 });
 
 $app->get('/new', function ($request) {
@@ -61,7 +68,10 @@ $app->get('/article/:id', function ($request, $attributes) use ($articles, $auth
     $article = $articles->findBy('id', $attributes['id']);
     $article['author'] = $authors->findBy('id', $article['author_id'])['name'];
     if ($article) {
-        return response(render('articles/article', ['title' => $article['title'], 'article' => $article]));
+        return response(render('article', [
+            'title' => $article['title'],
+            'article' => $article,
+            ]));
     }
 });
 
