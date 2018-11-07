@@ -32,7 +32,6 @@ $app->get('/', function ($request, $attributes) use ($articles, $authors) {
         return $item;
     }, $articles->getPage());
 
-    // return response(var_dump($articlesPerPage));
     $pages = ['current' => 1, 'count' => $articles->count()];
 
     return response(render('index', [
@@ -41,7 +40,6 @@ $app->get('/', function ($request, $attributes) use ($articles, $authors) {
         'pages' => $pages,
         ]));
 });
-//! починить пагинацию
 $app->get('/page/:page', function ($request, $attributes) use ($articles, $authors) {
     $articlesPerPage = array_map(function ($item) use ($authors) {
         $author = $authors->findBy('id', $item['author_id']);
@@ -77,14 +75,13 @@ $app->get('/article/:id', function ($request, $attributes) use ($articles, $auth
 
 $app->post('/articles', function ($request) use ($articles, $authors) {
     $formData = array_map('\Utilities\clean', $request->getQueryParam('article'));
-    // $articles->insert
     $errors = array_filter($formData, function ($value) {
         return empty($value);
     });
-    if ($errors) {
-        return response(render('articles/new', ['formData' => $formData, 'errors' => $errors]));
-    }
     $_SESSION['author'] = $formData['author'];
+    if ($errors) {
+        return response(render('new', ['title' => 'Добавить новость', 'formData' => $formData, 'errors' => $errors]));
+    }
     if ($authors->findBy('ssid', $_COOKIE['PHPSESSID'])) {
         $authors->update(['name' => $formData['author']], 'ssid', $_COOKIE['PHPSESSID']);
     } else {
