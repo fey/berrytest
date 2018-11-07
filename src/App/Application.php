@@ -11,12 +11,13 @@ class Application
 
     public function run()
     {
+        $session = new Session();
+        $session->start();
+        $_COOKIE['PHPSESSID'] = $_COOKIE['PHPSESSID'] ?? session_id();
         $this->request = new Request();
         $uri = $this->request->getUri();
         $method = $this->request->getMethod();
 
-        $session = new Session();
-        $session->start();
         if (!empty($this->getHandlerItem())) {
             [$preparedRoute, $handlerMethod, $handler, $attributes] = $this->getHandlerItem();
 

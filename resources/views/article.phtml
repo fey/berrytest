@@ -1,0 +1,19 @@
+<article>
+          <hr>
+          <h2><a href="/article/<?= $article['id']; ?>">#</a>
+            <?= $article['title']; ?>
+          </h2>
+          <h5><span class="glyphicon glyphicon-time"></span>
+            Автор
+            <?= $article['author']; ?>,
+
+            <?php echo (new \DateTime())->format('Y-m-d'); ?>
+          </h5>
+          <h4>
+            <?= $article['description']; ?>
+          </h4>
+          <p>
+            <?= $article['text']; ?>
+          </p>
+          <hr>
+        </article>

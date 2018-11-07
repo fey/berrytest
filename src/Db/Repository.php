@@ -25,7 +25,8 @@ class Repository
 
     public function all()
     {
-        $sql = "select * from {$this->table} ORDER BY created_at DESC";
+        // $sql = "select * from {$this->table} ORDER BY created_at DESC";
+        $sql = "select * from {$this->table}";
 
         return $this->pdo->query($sql)->fetchAll();
     }
@@ -53,7 +54,20 @@ class Repository
             return $pdo->quote($v);
         }, array_values($params)));
 
-        return $pdo->exec("insert into {$this->table} ($fields) values ($values)");
+        return $pdo->exec("INSERT INTO {$this->table} ($fields) VALUES ($values)");
+    }
+
+    public function update($params, $whereColumn, $whereValue)
+    {
+        $pdo = $this->pdo;
+        $whereValue = $pdo->quote($whereValue);
+        $values = implode(', ', array_map(function ($v, $k) use ($pdo) {
+            $preparedV = $pdo->quote($v);
+
+            return "{$k} = $preparedV";
+        }, array_values($params), array_keys($params)));
+
+        return $pdo->exec("UPDATE {$this->table} SET {$values} WHERE {$whereColumn} = {$whereValue}");
     }
 
     public function truncate($table)
