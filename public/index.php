@@ -13,6 +13,7 @@ use Db\Repository;
 $articles = new Repository('articles');
 $app = new Application();
 $authors = new Repository('authors');
+$comments = new Repository('comments');
 $sessid = session_id();
 $app->get('/session', function ($request) use ($articles, $authors) {
     $sessionId = $_COOKIE['PHPSESSID'];
@@ -59,13 +60,21 @@ $app->get('/page/:page', function ($request, $attributes) use ($articles, $autho
 $app->get('/new', function ($request) {
     return response(render('new', ['title' => 'Добавить новость']));
 });
-$app->get('/article/:id', function ($request, $attributes) use ($articles, $authors) {
-    $article = $articles->findBy('id', $attributes['id']);
+$app->get('/article/:id', function ($request, $attributes) use ($articles, $authors, $comments) {
+    $articleId = (int) $attributes['id'];
+    $article = $articles->findBy('id', $articleId);
     $article['author'] = $authors->findBy('id', $article['author_id'])['name'];
+    $comments = array_filter($comments->all(), function ($item) use ($articleId) {
+        return $item['article_id'] === $articleId;
+    });
+    $commentsTree = \Utilities\buildTree($comments);
+
     if ($article) {
-        return response(render('article', [
+        return response(render('show.article', [
             'title' => $article['title'],
             'article' => $article,
+            'comments' => $commentsTree,
+            'countComments' => count($comments),
             ]));
     }
 });
