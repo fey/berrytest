@@ -58,3 +58,37 @@ function isPaged(int $num, int $max): bool
 {
     return $num <= floor($max / 5) && $num > 1;
 }
+function buildTree($flat)
+{
+    $grouped = array_reduce($flat, function ($acc, $item) {
+        $acc[$item['parent_id']][] = $item;
+
+        return $acc;
+    }, []);
+
+    $fnBuilder = function ($siblings) use (&$fnBuilder, $grouped) {
+        foreach ($siblings as $key => $sibling) {
+            $id = $sibling['id'];
+            if (isset($grouped[$id])) {
+                $sibling['children'] = $fnBuilder($grouped[$id]);
+            }
+            $siblings[$key] = $sibling;
+        }
+
+        return $siblings;
+    };
+
+    $tree = $fnBuilder($grouped[0]);
+
+    return $tree;
+}
+function echoComments($comments, $parent = 0)
+{
+    foreach ($comments as $comment) {
+        include '../resources/views/comment.phtml';
+        if (isset($comment['children'])) {
+            echoComments($comment['children'], $parent + 1);
+        }
+        echo '</div>';
+    }
+}
