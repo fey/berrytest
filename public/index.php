@@ -50,7 +50,7 @@ $app->get('/page/:page', function ($request, $attributes) use ($articles, $autho
         return response()->redirect('/');
     }
 
-    return response(render('index', [
+    return response(render('article', [
         'articles' => $articlesPerPage,
         'pages' => $pages,
         'title' => "Новости, страница {$attributes['page']}",
