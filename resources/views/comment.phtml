@@ -1,0 +1,13 @@
+<div id="comment-<?= $comment['id']; ?>" class="col-sm-10">
+    <h4> Анонимно <small>Sep 29, 2015, 9:12 PM</small></h4>
+    <p>
+        <?= $comment['body']; ?>
+    </p>
+    <a class="answer1" href="#answer1">Answer</a>
+    <form id="myform" role="form">
+          <div class="form-group">
+            <textarea class="form-control" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+    <br>
