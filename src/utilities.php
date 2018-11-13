@@ -60,6 +60,9 @@ function isPaged(int $num, int $max): bool
 }
 function buildTree($flat)
 {
+    if (empty($flat)) {
+        return [];
+    }
     $grouped = array_reduce($flat, function ($acc, $item) {
         $acc[$item['parent_id']][] = $item;
 
