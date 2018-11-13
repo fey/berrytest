@@ -12,4 +12,4 @@
 
 <p><span class="badge"><?= $countComments; ?></span> Comments:</p><br>
 
-<?php Utilities\echoComments($comments); ?>
+<?php if (!empty($comments)): Utilities\echoComments($comments); endif; ?>
