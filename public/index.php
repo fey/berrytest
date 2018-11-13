@@ -15,11 +15,12 @@ $app = new Application();
 $authors = new Repository('authors');
 $comments = new Repository('comments');
 $sessid = session_id();
-$app->get('/session', function ($request) use ($articles, $authors) {
-    $sessionId = $_COOKIE['PHPSESSID'];
-    $author = $authors->findBy('ssid', $_COOKIE['PHPSESSID']);
+$app->get('/debug', function ($request) use ($articles, $authors, $comments) {
+    $comm = $comments->all();
 
-    return response(var_dump(session_id(), $_SESSION, $sessionId, $_COOKIE, $author));
+    return response(render('comments'));
+
+    return response(var_dump($comm));
 });
 
 $app->get('/', function ($request, $attributes) use ($articles, $authors) {
@@ -50,7 +51,7 @@ $app->get('/page/:page', function ($request, $attributes) use ($articles, $autho
         return response()->redirect('/');
     }
 
-    return response(render('article', [
+    return response(render('index', [
         'articles' => $articlesPerPage,
         'pages' => $pages,
         'title' => "Новости, страница {$attributes['page']}",
