@@ -61,6 +61,31 @@ $app->get('/page/:page', function ($request, $attributes) use ($articles, $autho
 $app->get('/new', function ($request) {
     return response(render('new', ['title' => 'Добавить новость']));
 });
+
+$app->post('/article/:id', function ($request, $attributes) use ($comments, $authors) {
+    $formData = array_map('\Utilities\clean', $request->getQueryParam('comment'));
+    $_SESSION['author'] = $formData['author'];
+    $errors = [];
+    if ($errors) {
+        // return response(render('new', ['title' => 'Добавить новость', 'formData' => $formData, 'errors' => $errors]));
+    }
+    if ($authors->findBy('ssid', $_COOKIE['PHPSESSID'])) {
+        $authors->update(['name' => $formData['author']], 'ssid', $_COOKIE['PHPSESSID']);
+    } else {
+        $authors->insert(['name' => $formData['author'], 'ssid' => $_COOKIE['PHPSESSID']]);
+    }
+    $author = $authors->findBy('ssid', $_COOKIE['PHPSESSID']);
+    $comments->insert([
+        'body' => str_replace(PHP_EOL, '</br>', $formData['body']),
+        'author_id' => $author['id'],
+        'article_id' => $attributes['id'],
+        'parent_id' => (int) $formData['parent_id'],
+    ]);
+
+    return response()->redirect("/article/{$attributes['id']}");
+
+    return response(var_dump($request->getQueryParams()));
+});
 $app->get('/article/:id', function ($request, $attributes) use ($articles, $authors, $comments) {
     $articleId = (int) $attributes['id'];
     $article = $articles->findBy('id', $articleId);
