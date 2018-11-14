@@ -4,11 +4,14 @@
 
 </body>
 <script>
-$(function(){
-   $('.answer1').click(function(){
-      $('#myform').toggle();
-      return false;
-   });
+$( document ).ready(function() {
+    $('.answer').click(function() {
+        const linkedForm = $(this).next();
+		$('.comment > .answer-form').not(linkedForm).hide();
+        linkedForm.toggle();
+    });
 });
+
+
 </script>
 </html>

@@ -1,0 +1,9 @@
+<form class="answer-form" id="" role="form">
+        <div class="form-group"><label for="author">Имя Автора</label>
+            <input value="<?= $_SESSION['author'] ?? $formData['author'] ?? ''; ?>" name="article[author]" type="text"
+                class="form-control has-feedback" id="author" placeholder="Имя Автора"></div>
+        <div class="form-group">
+            <textarea class="form-control" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
