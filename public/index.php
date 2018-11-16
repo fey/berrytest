@@ -93,8 +93,15 @@ $app->get('/article/:id', function ($request, $attributes) use ($articles, $auth
     $comments = array_filter($comments->all(), function ($item) use ($articleId) {
         return $item['article_id'] === $articleId;
     });
-    $commentsTree = \Utilities\buildTree($comments);
 
+    $commentsWithAuthors = array_map(function ($comment) use ($authors) {
+        $author = $authors->findBy('id', $comment['author_id']);
+        $comment['author'] = $author['name'];
+
+        return $comment;
+    }, $comments);
+
+    $commentsTree = \Utilities\buildTree($commentsWithAuthors);
     if ($article) {
         return response(render('show.article', [
             'title' => $article['title'],
