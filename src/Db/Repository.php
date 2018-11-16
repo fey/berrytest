@@ -53,8 +53,11 @@ class Repository
         $values = implode(', ', array_map(function ($v) use ($pdo) {
             return $pdo->quote($v);
         }, array_values($params)));
+        $sql = "INSERT INTO {$this->table} ($fields) VALUES ($values)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
 
-        return $pdo->exec("INSERT INTO {$this->table} ($fields) VALUES ($values)");
+        return $pdo->lastInsertId();
     }
 
     public function update($params, $whereColumn, $whereValue)
