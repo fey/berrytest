@@ -10,20 +10,22 @@ $( document ).ready(function() {
         const linkedForm = $(this).next();
 		$('.comment > .answer-form').not(linkedForm).hide();
         linkedForm.toggle();
+
     });
-    $( "form" ).submit(function(event) {
+    $( "form" ).submit(function( event ) {
         event.preventDefault();
         const formData = $(this).serialize();
         $.ajax({
-            method: "POST",
+            type: "POST",
             url: "",
+            data: formData,
             dataType: "text",
+            success: function (response) {
+                const newComment = $.parseJSON(response);
+                $('#comment-' + newComment['parent_id']).load('/article/71 #comment-' + newComment['id']);
+            }
         });
-        return false;
-        });  
-    
-    
-    
+    });
 });
 
 

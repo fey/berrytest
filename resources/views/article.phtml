@@ -1,8 +1,8 @@
-
-          <h2><a href="/article/<?= $article['id']; ?>">#</a>
+<article id="<?= $article['id']; ?>">
+<h2><a href="/article/<?= $article['id']; ?>">#</a>
             <?= $article['title']; ?>
           </h2>
-          <h5><span class="glyphicon glyphicon-time"></span>
+          <h5 "><span class="glyphicon glyphicon-time"></span>
             Автор
             <?= $article['author']; ?>,
 
@@ -14,3 +14,5 @@
           <p>
             <?= $article['text']; ?>
           </p>
+</article>
+
