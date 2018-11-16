@@ -5,24 +5,25 @@
 </body>
 <script>
 $( document ).ready(function() {
-
-    $('.answer').click(function() {
+    $(this).on("click", ".answer", function () {
         const linkedForm = $(this).next();
 		$('.comment > .answer-form').not(linkedForm).hide();
         linkedForm.toggle();
-
     });
-    $( "form" ).submit(function( event ) {
+    $(this).on("submit", "form", function (event) {
         event.preventDefault();
         const formData = $(this).serialize();
         $.ajax({
-            type: "POST",
-            url: "",
-            data: formData,
+            type:     "POST",
+            url:      "",
+            data:     formData,
             dataType: "text",
             success: function (response) {
                 const newComment = $.parseJSON(response);
-                $('#comment-' + newComment['parent_id']).load('/article/71 #comment-' + newComment['id']);
+                $.get('', function(data) {
+                    comment = $(data).find('#comment-' + newComment['id']);
+                    $('#comment-' + newComment['parent_id']).append(comment);
+                });
             }
         });
     });
