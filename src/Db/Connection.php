@@ -13,6 +13,7 @@ class Connection
         $this->pdo = new PDO('pgsql:host=tantor.db.elephantsql.com;dbname=fihqhtuc;', 'fihqhtuc', 'aGGcjL1UX_h26cyWrIdwWtFdnYijcH44', [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_PERSISTENT => true,
         ]);
     }
 
