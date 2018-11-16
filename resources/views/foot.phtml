@@ -5,11 +5,25 @@
 </body>
 <script>
 $( document ).ready(function() {
+
     $('.answer').click(function() {
         const linkedForm = $(this).next();
 		$('.comment > .answer-form').not(linkedForm).hide();
         linkedForm.toggle();
     });
+    $( "form" ).submit(function(event) {
+        event.preventDefault();
+        const formData = $(this).serialize();
+        $.ajax({
+            method: "POST",
+            url: "",
+            dataType: "text",
+        });
+        return false;
+        });  
+    
+    
+    
 });
 
 

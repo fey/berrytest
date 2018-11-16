@@ -5,6 +5,6 @@
     <div class="form-group">
         <textarea wrap="hard" name="comment[body]" class="form-control" rows="5" cols="100" autocomplete="off"><?= $formData['body'] ?? ''; ?></textarea>
     </div>
-    <input id="prodId" name="comment[parent_id]" type="hidden" value="<?= $comment['id'] ?? '0'; ?>">
+    <input id="parentId" name="comment[parent_id]" type="hidden" value="<?= $comment['id'] ?? '0'; ?>">
     <button type="submit" class="btn btn-success">Submit</button>
 </form>
