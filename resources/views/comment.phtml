@@ -1,4 +1,4 @@
-<div id="comment-<?= $comment['id'] ?? '0'; ?>" class="col-sm-12 comment">
+<div id="comment-<?= $comment['id']; ?>" class="col-sm-12 comment">
     <h4> <?= $comment['author'] ?? 'Анонимно'; ?> <small><?= $comment['created_at'] ?? 'Дата неизвестна'; ?></small></h4>
     <p>
         <?= $comment['body'] ?? '<i>Комментарий скрыт</i>'; ?>
