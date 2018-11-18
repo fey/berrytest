@@ -1,6 +1,8 @@
 <article id="<?= $article['id']; ?>">
-<h2><a href="/article/<?= $article['id']; ?>">#</a>
-            <?= $article['title']; ?>
+<h2><?php if (isset($comments)): ?> <a href="/">&larr;</a> 
+<?php endif; ?>
+  <a href="/article/<?= $article['id']; ?>"><?= $article['title']; ?></a>
+            
           </h2>
           <h5 "><span class="glyphicon glyphicon-time"></span>
             Автор
@@ -8,11 +10,14 @@
 
             <?php echo (new \DateTime())->format('Y-m-d'); ?>
           </h5>
-          <h4>
-            <?= $article['description']; ?>
-          </h4>
+          <?php if (isset($comments)): ?>
+          <?= $article['text']; ?>
+          <?php else: ?>
           <p>
-            <?= $article['text']; ?>
+              <h4>
+              <?= $article['description']; ?>
+            </h4>
           </p>
+          <?php endif; ?>
 </article>
 
