@@ -22,6 +22,7 @@ $(document).ready(function () {
         linkedForm.toggle();
     });
     $(this).on("submit", "form", function (event) {
+        eventedForm = this;
         const submitButton = $('button[type=submit], input[type=submit]');
         submitButton.prop('disabled', true);
         event.preventDefault();
@@ -41,6 +42,8 @@ $(document).ready(function () {
 
                     $('.countComments').text($(data).find('.countComments').text());
                     submitButton.prop('disabled', false);
+
+                    $(eventedForm).find("textarea").val("");
                 });
             }
         });
