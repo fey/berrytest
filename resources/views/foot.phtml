@@ -1,36 +1,41 @@
-</div>
 
+</div>
 </div>
 
 </body>
 <?php if (isset($comments)): ?>
 <script>
-$( document ).ready(function() {
+$(document).ready(function () {
     $(this).on("click", ".answer", function () {
         const linkedForm = $(this).next();
-		$('.comment > .answer-form').not(linkedForm).hide();
+        $('.comment > .answer-form').not(linkedForm).hide();
         linkedForm.toggle();
     });
     $(this).on("submit", "form", function (event) {
+        const submitButton = $('button[type=submit], input[type=submit]');
+        submitButton.prop('disabled', true);
         event.preventDefault();
         const formData = $(this).serialize();
         $.ajax({
-            type:     "POST",
-            url:      "",
-            data:     formData,
+            type: "POST",
+            url: "",
+            data: formData,
             dataType: "text",
             success: function (response) {
                 const newComment = $.parseJSON(response);
-                $.get('', function(data) {
-                    comment = $(data).find('#comment-' + newComment['id']);
-                    $('#comment-' + newComment['parent_id']).append(comment);
+                $.get('', function (data) {
+
+                    $('#comment-' + newComment['parent_id'])
+                        .append($(data).find('#comment-' + newComment['id']));
+                    const counter = $(data).find('.countComments');
+
+                    $('.countComments').text($(data).find('.countComments').text());
+                    submitButton.prop('disabled', false);
                 });
             }
         });
     });
 });
-
-
 </script>
 <?php endif; ?>
 </html>
