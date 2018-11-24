@@ -56,7 +56,7 @@ function str2url($str)
 }
 function isPaged(int $num, int $max): bool
 {
-    return $num <= floor($max / 5) && $num > 1;
+    return $num <= ceil($max / 5) && $num > 1;
 }
 function buildTree($flat)
 {
