@@ -8,11 +8,11 @@ use function Utilities\isPaged;
         <?php 
 if (isPaged($pages['current'], $pages['count'])): ?>
           <li class="previous"><a href="/page/<?= $pages['current'] - 1; ?>">
-          <span aria-hidden="true">&larr;</span> Older</a></li>
+          <span aria-hidden="true">&larr;</span> Newer</a></li>
         <?php endif; ?>
         <?php if (isPaged($pages['current'] + 1, $pages['count'])): ?>
         <li class="next"><a href="/page/<?= $pages['current'] + 1; ?>">
-        Newer <span aria-hidden="true">&rarr;</span></a></li>
+         Older<span aria-hidden="true">&rarr;</span></a></li>
         <?php endif; ?>
       </ul>
     </nav>
