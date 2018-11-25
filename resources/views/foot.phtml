@@ -45,6 +45,7 @@ $(document).ready(function () {
                     $(eventedForm).find("textarea").val("");
                     submitButton.prop('disabled', false);
                     $(".bg-warning").remove();
+                    $('.comment > .answer-form').hide();
                 });
             },
             error: function (response) {
