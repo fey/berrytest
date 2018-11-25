@@ -21,7 +21,7 @@ $(document).ready(function () {
         $('.comment > .answer-form').not(linkedForm).hide();
         linkedForm.toggle();
     });
-    $(this).on("submit", "form", function (event) {
+    $(this).on("submit", ".answer-form", function (event) {
         eventedForm = this;
         const submitButton = $('button[type=submit], input[type=submit]');
         submitButton.prop('disabled', true);
@@ -41,10 +41,24 @@ $(document).ready(function () {
                     const counter = $(data).find('.countComments');
 
                     $('.countComments').text($(data).find('.countComments').text());
-                    submitButton.prop('disabled', false);
 
                     $(eventedForm).find("textarea").val("");
+                    submitButton.prop('disabled', false);
+                    $(".bg-warning").remove();
                 });
+            },
+            error: function (response) {
+                const errors = $.parseJSON(response.responseText);
+                $(".bg-warning").remove();
+                $.each(errors, function (index, item) {
+                    $(eventedForm).find(".comment-"+ index).before(function (item) {
+                        return "<p class='bg-warning'>Не может быть пустым</p>";
+                    });
+                });
+                submitButton.prop('disabled', false);
+            },
+            complete: function (response) {
+                
             }
         });
     });
