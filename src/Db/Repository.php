@@ -44,9 +44,9 @@ class Repository
         return $this->pdo->query($sql)->fetchAll();
     }
 
-    public function getPage($page = 1, $limit = 5)
+    public function getPage($page = 1, $column = 'created_at', $sort = 'DESC', $limit = 5)
     {
-        $sql = "select * from {$this->table} ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        $sql = "select * from {$this->table} ORDER BY {$column} {$sort} LIMIT ? OFFSET ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$limit, ($page - 1) * $limit]);
 
@@ -89,5 +89,12 @@ class Repository
     public function truncate($table)
     {
         return $this->pdo->exec("TRUNCATE $table CASCADE");
+    }
+
+    public function setTable($table)
+    {
+        $this->table = $table;
+
+        return $this;
     }
 }
