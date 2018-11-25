@@ -1,10 +1,19 @@
-<form class="answer-form" id="form-for-<?= $comment['id'] ?? '0'; ?>" role="form" method="POST" action="">
+<form class="answer-form" id="form-for-<?= isset($comment) ? $comment->getId() : '0'; ?>" role="form" method="POST" action="">
     <div class="form-group"><label for="author">Имя Автора</label>
+    <?php if (isset($errors['author'])): ?>
+            имя автора не может быть пустым
+<?php endif; ?>
+
+
         <input value="<?= $_SESSION['author'] ?? $formData['author'] ?? ''; ?>" name="comment[author]" type="text"
-            class="form-control has-feedback" id="author" placeholder="Имя Автора"></div>
+            class="form-control has-feedback comment-author" id="author" placeholder="Имя Автора"></div>
+
     <div class="form-group">
-        <textarea wrap="hard" name="comment[body]" class="form-control" rows="5" cols="100" autocomplete="off"><?= $formData['body'] ?? ''; ?></textarea>
+<?php if (isset($errors['body'])): ?>
+            комментарий не может быть пустым
+<?php endif; ?>
+        <textarea wrap="hard" name="comment[body]" class="form-control comment-body" rows="5" cols="100" autocomplete="off"><?= $formData['body'] ?? ''; ?></textarea>
     </div>
-    <input id="parentId" name="comment[parent_id]" type="hidden" value="<?= $comment['id'] ?? '0'; ?>">
+    <input id="parentId" name="comment[parent_id]" type="hidden" value="<?= isset($comment) ? $comment->getId() : '0'; ?>">
     <button type="submit" class="btn btn-success">Submit</button>
 </form>

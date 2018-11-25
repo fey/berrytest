@@ -6,7 +6,7 @@
         <?php foreach ($articles as $article): ?>
         <article>
         <?php  include 'article.phtml'; ?>
-        <a href="/article/<?= $article['id']; ?>">Читать далее</a>
+        <a href="/article/<?= $article->getId(); ?>">Читать далее</a>
         <hr>
         </article>
         <?php endforeach; ?>

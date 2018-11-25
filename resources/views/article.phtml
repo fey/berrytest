@@ -1,21 +1,21 @@
-<article id="<?= $article['id']; ?>">
+<article id="<?= $article->getId(); ?>">
 <h2><?php if (isset($comments)): ?> <a href="/">&larr;</a> 
 <?php endif; ?>
-  <a href="/article/<?= $article['id']; ?>"><?= $article['title']; ?></a>
+  <a href="/article/<?= $article->getId(); ?>"><?= $article->getTitle(); ?></a>
             
           </h2>
           <h5 "><span class="glyphicon glyphicon-time"></span>
             Автор
-            <?= $article['author']; ?>,
+            <?= $article->getAuthor(); ?>,
 
-            <?php echo (new \DateTime())->format('Y-m-d'); ?>
+            <?= $article->getCreatedAt(); ?>
           </h5>
           <?php if (isset($comments)): ?>
-          <?= $article['text']; ?>
+          <?= $article->getTextbody(); ?>
           <?php else: ?>
           <p>
               <h4>
-              <?= $article['description']; ?>
+              <?= $article->getDescription(); ?>
             </h4>
           </p>
           <?php endif; ?>

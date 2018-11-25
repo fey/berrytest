@@ -9,29 +9,20 @@ error_reporting(E_ALL);
 require_once '../vendor/autoload.php';
 use function App\Renderer\render;
 use Db\Repository;
+use Db\PostManager;
+use Db\CommentManager;
 
-$articles = new Repository('articles');
 $app = new Application();
-$authors = new Repository('authors');
+$articles = new Repository('articles');
 $comments = new Repository('comments');
 $sessid = session_id();
-$app->get('/debug', function ($request) use ($articles, $authors, $comments) {
-    $comm = $comments->all();
+$app->postManager = new PostManager();
 
-    return response(render('comments'));
+$app->get('/', function ($request, $attributes) {
+    $postManager = new PostManager();
+    $articlesPerPage = $postManager->getPage();
 
-    return response(var_dump($comm));
-});
-
-$app->get('/', function ($request, $attributes) use ($articles, $authors) {
-    $articlesPerPage = array_map(function ($item) use ($authors) {
-        $author = $authors->findBy('id', $item['author_id']);
-        $item['author'] = $author['name'];
-
-        return $item;
-    }, $articles->getPage());
-
-    $pages = ['current' => 1, 'count' => $articles->count()];
+    $pages = ['current' => 1, 'count' => $postManager->getCount()];
 
     return response(render('index', [
         'title' => 'Главная страница',
@@ -39,102 +30,81 @@ $app->get('/', function ($request, $attributes) use ($articles, $authors) {
         'pages' => $pages,
         ]));
 });
-$app->get('/page/:page', function ($request, $attributes) use ($articles, $authors) {
-    $articlesPerPage = array_map(function ($item) use ($authors) {
-        $author = $authors->findBy('id', $item['author_id']);
-        $item['author'] = $author['name'];
-
-        return $item;
-    }, $articles->getPage($attributes['page']));
-    $pages = ['current' => $attributes['page'], 'count' => $articles->count()];
-    if ($pages['current'] < 2) {
+$app->get('/page/:page', function ($request, $attributes) {
+    $page = (int) $attributes['page'];
+    if ($page < 2) {
         return response()->redirect('/');
     }
+    $postManager = new PostManager();
+    $articlesPerPage = $postManager->getPage($page);
+    $pages = ['current' => $attributes['page'], 'count' => $postManager->getCount()];
 
     return response(render('index', [
         'articles' => $articlesPerPage,
         'pages' => $pages,
-        'title' => "Новости, страница {$attributes['page']}",
+        'title' => "Новости, страница {$page}",
         ]));
 });
-
 $app->get('/new', function ($request) {
     return response(render('new', ['title' => 'Добавить новость']));
 });
-$app->post('/article/:id', function ($request, $attributes) use ($comments, $authors) {
-    $formData = array_map('\Utilities\clean', $request->getQueryParam('comment'));
-    $_SESSION['author'] = $formData['author'];
-    $errors = [];
-    if ($errors) {
-        //return response(render('new', ['title' => 'Добавить новость', 'formData' => $formData, 'errors' => $errors]));
-    }
-    if ($authors->findBy('ssid', $_COOKIE['PHPSESSID'])) {
-        $authors->update(['name' => $formData['author']], 'ssid', $_COOKIE['PHPSESSID']);
+$app->post('/articles', function ($request) use ($articles) {
+    $formData = $request->getQueryParam('article');
+    $manager = new PostManager();
+    $errors = $manager->validate($formData);
+    if (!empty($errors)) {
+        return response(render('new', [
+            'title' => 'Добавить новость',
+            'formData' => $formData,
+            'errors' => $errors, ]));
     } else {
-        $authors->insert(['name' => $formData['author'], 'ssid' => $_COOKIE['PHPSESSID']]);
+        $_SESSION['author'] = $formData['author'];
+        $manager->save($formData);
+
+        return response()->redirect('/');
     }
-    $author = $authors->findBy('ssid', $_COOKIE['PHPSESSID']);
-    $insertId = $comments->insert([
-        'body' => str_replace(PHP_EOL, '</br>', $formData['body']),
-        'author_id' => $author['id'],
-        'article_id' => $attributes['id'],
-        'parent_id' => (int) $formData['parent_id'],
-    ], true);
-    $newComment = json_encode($comments->findBy('id', $insertId));
+});
+
+$app->post('/article/:id', function ($request, $attributes) {
+    $id = (int) $attributes['id'];
+    $commentManager = new CommentManager($id);
+    $postManager = new PostManager();
+    $article = $postManager->getById($id);
+    $formData = $commentManager->sanitize($request->getQueryParam('comment'));
+    $_SESSION['author'] = $formData['author'];
+    $errors = $commentManager->validate($formData);
+    if ($errors) {
+        return response(json_encode($errors))->withStatus(400);
+
+        return response(render('show.article', [
+            'title' => 'Добавить новость',
+            'formData' => $formData,
+            'errors' => $errors,
+            'article' => $article,
+            'comments' => $commentManager->getTree(),
+            'countComments' => 0,
+            ]));
+    }
+    $lastInsertId = $commentManager->save($formData);
+    $newComment = json_encode($commentManager->getById($lastInsertId));
 
     return response($newComment);
 
     return response()->redirect("/article/{$attributes['id']}");
 });
-$app->get('/article/:id', function ($request, $attributes) use ($articles, $authors, $comments) {
-    $articleId = (int) $attributes['id'];
-    $article = $articles->findBy('id', $articleId);
-    $article['author'] = $authors->findBy('id', $article['author_id'])['name'];
-    $comments = array_filter($comments->all(), function ($item) use ($articleId) {
-        return $item['article_id'] === $articleId;
-    });
 
-    $commentsWithAuthors = array_map(function ($comment) use ($authors) {
-        $author = $authors->findBy('id', $comment['author_id']);
-        $comment['author'] = $author['name'];
+$app->get('/article/:id', function ($request, $attributes) {
+    $id = (int) $attributes['id'];
+    $postManager = new PostManager();
+    $commentManager = new CommentManager($id);
+    $article = $postManager->getById($id);
 
-        return $comment;
-    }, $comments);
-
-    $commentsTree = \Utilities\buildTree($commentsWithAuthors);
-    if ($article) {
-        return response(render('show.article', [
-            'title' => $article['title'],
-            'article' => $article,
-            'comments' => $commentsTree,
-            'countComments' => count($comments),
-            ]));
-    }
-});
-
-$app->post('/articles', function ($request) use ($articles, $authors) {
-    $formData = array_map('\Utilities\clean', $request->getQueryParam('article'));
-    $errors = array_filter($formData, function ($value) {
-        return empty($value);
-    });
-    $_SESSION['author'] = $formData['author'];
-    if ($errors) {
-        return response(render('new', ['title' => 'Добавить новость', 'formData' => $formData, 'errors' => $errors]));
-    }
-    if ($authors->findBy('ssid', $_COOKIE['PHPSESSID'])) {
-        $authors->update(['name' => $formData['author']], 'ssid', $_COOKIE['PHPSESSID']);
-    } else {
-        $authors->insert(['name' => $formData['author'], 'ssid' => $_COOKIE['PHPSESSID']]);
-    }
-    $author = $authors->findBy('ssid', $_COOKIE['PHPSESSID']);
-    $articles->insert([
-        'description' => $formData['description'],
-        'text' => str_replace(PHP_EOL, '</br>', $formData['text']),
-        'author_id' => $author['id'],
-        'title' => $formData['title'],
-    ]);
-
-    return response()->redirect('/');
+    return response(render('show.article', [
+        'title' => $article->getTitle(),
+        'article' => $article,
+        'comments' => $commentManager->getTree(),
+        'countComments' => $commentManager->count(),
+        ]));
 });
 
 $app->delete('/articles', function ($request) use ($articles) {
@@ -142,5 +112,4 @@ $app->delete('/articles', function ($request) use ($articles) {
 
     return response()->redirect('/');
 });
-
 $app->run();

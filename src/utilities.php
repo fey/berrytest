@@ -64,16 +64,18 @@ function buildTree($flat)
         return [];
     }
     $grouped = array_reduce($flat, function ($acc, $item) {
-        $acc[$item['parent_id']][] = $item;
+        $acc[$item->getParentId()][] = $item;
 
         return $acc;
     }, []);
 
     $fnBuilder = function ($siblings) use (&$fnBuilder, $grouped) {
         foreach ($siblings as $key => $sibling) {
-            $id = $sibling['id'];
+            $id = $sibling->getId();
+
             if (isset($grouped[$id])) {
-                $sibling['children'] = $fnBuilder($grouped[$id]);
+                // $sibling['children'] = $fnBuilder($grouped[$id]);
+                $sibling->setChildren($fnBuilder($grouped[$id]));
             }
             $siblings[$key] = $sibling;
         }
@@ -89,8 +91,8 @@ function echoComments($comments, $parent = 0)
 {
     foreach ($comments as $comment) {
         include '../resources/views/comment.phtml';
-        if (isset($comment['children'])) {
-            echoComments($comment['children'], $parent + 1);
+        if ($comment->getChildren()) {
+            echoComments($comment->getChildren(), $parent + 1);
         }
         echo '</div>';
     }
