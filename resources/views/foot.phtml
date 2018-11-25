@@ -56,6 +56,12 @@ $(document).ready(function () {
                         return "<p class='bg-warning'>Не может быть пустым</p>";
                     });
                 });
+                if(errors.db) {
+                    const dber = errors.db;
+                    $(eventedForm).find(".comment-author").before(function () {
+                        return "<p class='bg-warning'>Слишком длинное поле</p>";
+                    });
+                }
                 submitButton.prop('disabled', false);
             },
             complete: function (response) {

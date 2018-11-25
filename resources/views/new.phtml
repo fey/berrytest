@@ -1,6 +1,9 @@
 <?php include 'head.phtml'; ?>
 
                 <form method="POST" action="/articles">
+                <?php if (isset($errors['db'])): ?>
+                    <div class="alert alert-danger">Ошибка при отправке <?= $errors['db']; ?></div>
+                    <?php endif; ?>
                     <div class="form-group"><label for="author">Имя Автора</label>
                     <?php if (isset($errors['author'])): ?>
                     <p class="bg-warning">Укажите имя Автора</p>

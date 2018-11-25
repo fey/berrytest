@@ -56,13 +56,26 @@ $app->post('/articles', function ($request) use ($articles) {
         return response(render('new', [
             'title' => 'Добавить новость',
             'formData' => $formData,
-            'errors' => $errors, ]));
-    } else {
+            'errors' => $errors, ]))->withStatus(400);
+    }
+    try {
         $_SESSION['author'] = $formData['author'];
         $manager->save($formData);
+    } catch (\PDOException $e) {
+        if ($e->getCode() === '22001') {
+            $errors['db'] = 'Поля слишком длинные';
+        }
 
-        return response()->redirect('/');
+        return response(render('new', [
+            'title' => 'Добавить новость',
+            'formData' => $formData,
+            'errors' => $errors,
+            ]))->withStatus(400);
+
+        return response($e->getMessage());
     }
+
+    return response()->redirect('/');
 });
 
 $app->post('/article/:id', function ($request, $attributes) {
@@ -71,7 +84,6 @@ $app->post('/article/:id', function ($request, $attributes) {
     $postManager = new PostManager();
     $article = $postManager->getById($id);
     $formData = $commentManager->sanitize($request->getQueryParam('comment'));
-    $_SESSION['author'] = $formData['author'];
     $errors = $commentManager->validate($formData);
     if ($errors) {
         return response(json_encode($errors))->withStatus(400);
@@ -85,7 +97,15 @@ $app->post('/article/:id', function ($request, $attributes) {
             'countComments' => 0,
             ]));
     }
-    $lastInsertId = $commentManager->save($formData);
+    try {
+        $_SESSION['author'] = $formData['author'];
+        $lastInsertId = $commentManager->save($formData);
+    } catch (\PDOException $e) {
+        $errors['db'] = 'поле слишком длинное';
+
+        return response(json_encode($errors))->withStatus(400);
+    }
+
     $newComment = json_encode($commentManager->getById($lastInsertId));
 
     return response($newComment);
