@@ -15,7 +15,7 @@
                     <p class="bg-warning">Добавьте заголовок</p>
                     <?php endif; ?>
                     <input value="<?= $formData['title'] ?? ''; ?>" name="article[title]" autocomplete="off" type="text" class="form-control"
-                            id="description" placeholder="Короткое описание"></div>
+                            id="description" placeholder="Заголовок статьи"></div>
                     <div class="form-group"><label for="description">Короткое описание</label>
                     <?php if (isset($errors['description'])): ?>
                     <p class="bg-warning">Необходимо короткое описание</p>
