@@ -1,10 +1,4 @@
 composer.phar
 /vendor/
-.*
-db/berry.sql
-db/data.sql
-
 *.log
-.*/
-*.sql
 tests/
