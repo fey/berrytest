@@ -65,7 +65,6 @@ $app->post('/articles', function ($request) use ($articles) {
         if ($e->getCode() === '22001') {
             $errors['db'] = 'Поля слишком длинные';
         }
-
         return response(render('new', [
             'title' => 'Добавить новость',
             'formData' => $formData,
@@ -101,16 +100,14 @@ $app->post('/article/:id', function ($request, $attributes) {
         $_SESSION['author'] = $formData['author'];
         $lastInsertId = $commentManager->save($formData);
     } catch (\PDOException $e) {
-        $errors['db'] = 'поле слишком длинное';
-
+        $errors['db'] = $e->getMessage();
         return response(json_encode($errors))->withStatus(400);
     }
 
     $newComment = json_encode($commentManager->getById($lastInsertId));
 
-    return response($newComment);
-
-    return response()->redirect("/article/{$attributes['id']}");
+    return ($request->getHeader('HTTP_X_REQUESTED_WITH')) ? response($newComment) :
+    response()->redirect("/article/{$attributes['id']}");
 });
 
 $app->get('/article/:id', function ($request, $attributes) {
