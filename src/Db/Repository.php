@@ -86,15 +86,4 @@ class Repository
         return $pdo->exec("UPDATE {$this->table} SET {$values} WHERE {$whereColumn} = {$whereValue}");
     }
 
-    public function truncate($table)
-    {
-        return $this->pdo->exec("TRUNCATE $table CASCADE");
-    }
-
-    public function setTable($table)
-    {
-        $this->table = $table;
-
-        return $this;
-    }
 }

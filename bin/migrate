@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+
+<?php
+use Db\Repository;
+
+$autoloadPath1 = __DIR__.'/../../../autoload.php';
+$autoloadPath2 = __DIR__.'/../vendor/autoload.php';
+if (file_exists($autoloadPath1)) {
+    require_once $autoloadPath1;
+} else {
+    require_once $autoloadPath2;
+}
+$db = parse_url(getenv('DATABASE_URL'));
+$pdo = new PDO('pgsql:'.sprintf(
+    'host=%s;port=%s;user=%s;password=%s;dbname=%s',
+    $db['host'],
+    $db['port'],
+    $db['user'],
+    $db['pass'],
+    ltrim($db['path'], '/')
+));
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+$pdo->setAttribute(PDO::ATTR_PERSISTENT, true);
+
+$query = file_get_contents(__DIR__ . '/dump.sql');
+$pdo->exec($query);

@@ -22,11 +22,11 @@
                     <?php endif; ?>
                     <input value="<?= $formData['description'] ?? ''; ?>" name="article[description]" autocomplete="off" type="text" class="form-control"
                             id="description" placeholder="Короткое описание"></div>
-                    <div class="form-group"><label  for="body">Текст статьи</label>
+                    <div class="form-group"><label  for="article[body]">Текст статьи</label>
                     <?php if (isset($errors['text'])): ?>
                     <p class="bg-warning">Заполните содержимое статьи</p>
                     <?php endif; ?>
-                            <textarea wrap="hard" name="article[text]" class="form-control" rows="10" autocomplete="off"><?= $formData['text'] ?? ''; ?></textarea>
+                            <textarea wrap="hard" name="article[body]" class="form-control" rows="10" autocomplete="off"><?= $formData['body'] ?? ''; ?></textarea>
                         </div>
 
                     <input type="submit" class="btn btn-default" value="Отправить">
