@@ -1,6 +1,10 @@
 <?php
 
 namespace App;
+const CONFIG_PATH = __DIR__ . DIRECTORY_SEPARATOR . '../config.ini';
+if (file_exists(CONFIG_PATH)) {
+    putenv("DATABASE_URL=" . parse_ini_file(CONFIG_PATH)['DATABASE_URL']);
+}
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -13,6 +17,7 @@ use Db\PostManager;
 use Db\CommentManager;
 
 $app = new Application();
+
 $articles = new Repository('articles');
 $comments = new Repository('comments');
 $sessid = session_id();
