@@ -1,16 +1,14 @@
 <?php
 
 namespace App;
-const CONFIG_PATH = __DIR__ . DIRECTORY_SEPARATOR . '../config.ini';
-if (file_exists(CONFIG_PATH)) {
-    putenv("DATABASE_URL=" . parse_ini_file(CONFIG_PATH)['DATABASE_URL']);
+
+$autoloadPath1 = __DIR__.'/../../../autoload.php';
+$autoloadPath2 = __DIR__.'/../vendor/autoload.php';
+if (file_exists($autoloadPath1)) {
+    require_once $autoloadPath1;
+} else {
+    require_once $autoloadPath2;
 }
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-require_once '../vendor/autoload.php';
 use function App\Renderer\render;
 use Db\Repository;
 use Db\PostManager;
