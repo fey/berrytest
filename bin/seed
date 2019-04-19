@@ -3,6 +3,7 @@
 <?php
 use Db\Repository;
 
+
 $autoloadPath1 = __DIR__.'/../../../autoload.php';
 $autoloadPath2 = __DIR__.'/../vendor/autoload.php';
 if (file_exists($autoloadPath1)) {
@@ -10,8 +11,17 @@ if (file_exists($autoloadPath1)) {
 } else {
     require_once $autoloadPath2;
 }
+
 $repo = new Repository('articles');
 $pdo = $repo->getPdo();
 
-$query = file_get_contents(__DIR__ . '/dump.sql');
-$pdo->exec($query);
+$faker = (new Faker\Factory())->create();
+
+for($i = 0; $i <= 10; $i += 1) {
+    $repo->insert([
+        'author'      => $faker->name(),
+        'title'       => $faker->sentence(10, true),
+        'description' => $faker->sentences(3, true),
+        'body'        => $faker->realText(400, 3),
+    ]);
+}

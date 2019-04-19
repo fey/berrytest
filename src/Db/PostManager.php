@@ -51,7 +51,7 @@ class PostManager
         $data = $this->sanitize($data);
         $prepareData = [
             'description' => $data['description'],
-            'body' => str_replace(PHP_EOL, '</br>', $data['text']),
+            'body' => str_replace(PHP_EOL, '</br>', $data['body']),
             'title' => $data['title'],
             'author' => $data['author'],
         ];

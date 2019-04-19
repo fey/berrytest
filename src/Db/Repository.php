@@ -12,8 +12,8 @@ class Repository
     public function __construct($table)
     {
         $db = parse_url(getenv('DATABASE_URL'));
-        $this->pdo = new PDO('pgsql:'.sprintf(
-            'host=%s;port=%s;user=%s;password=%s;dbname=%s',
+        $this->pdo = new PDO(sprintf(
+            'pgsql:host=%s;port=%s;user=%s;password=%s;dbname=%s',
             $db['host'],
             $db['port'],
             $db['user'],
@@ -86,4 +86,8 @@ class Repository
         return $pdo->exec("UPDATE {$this->table} SET {$values} WHERE {$whereColumn} = {$whereValue}");
     }
 
+    public function getPdo()
+    {
+        return $this->pdo;
+    }
 }

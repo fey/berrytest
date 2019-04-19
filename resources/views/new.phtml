@@ -1,5 +1,7 @@
 <?php include 'head.phtml'; ?>
-
+                <?php foreach($errors as $error): ?>
+                <p><?= $error ?>
+                <?php endforeach; ?>
                 <form method="POST" action="/articles">
                 <?php if (isset($errors['db'])): ?>
                     <div class="alert alert-danger">Ошибка при отправке <?= $errors['db']; ?></div>

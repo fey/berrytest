@@ -29,43 +29,31 @@ $(document).ready(function () {
         const formData = $(this).serialize();
         $.ajax({
             type: "POST",
-            url: "",
+            url: "/comments",
             data: formData,
             dataType: "text",
+            beforeSend: function (response) {
+                $(".bg-warning").remove();
+            },
             success: function (response) {
                 const newComment = $.parseJSON(response);
                 $.get('', function (data) {
-
-                    $('#comment-' + newComment['parent_id'])
-                        .append($(data).find('#comment-' + newComment['id']));
                     const counter = $(data).find('.countComments');
-
+                    $('#comment-' + newComment['parent_id']).append($(data).find('#comment-' + newComment['id']));
                     $('.countComments').text($(data).find('.countComments').text());
-
                     $(eventedForm).find("textarea").val("");
-                    submitButton.prop('disabled', false);
-                    $(".bg-warning").remove();
                     $('.comment > .answer-form').hide();
                 });
             },
             error: function (response) {
-                const errors = $.parseJSON(response.responseText);
-                $(".bg-warning").remove();
-                $.each(errors, function (index, item) {
-                    $(eventedForm).find(".comment-"+ index).before(function (item) {
-                        return "<p class='bg-warning'>Не может быть пустым</p>";
+                $.each(this.parseJSON(response.responseText), function (index, item) {
+                    $(eventedForm).find(".comment-"+ index).before(function () {
+                        return `<p class='bg-warning'>Поле ${item} </p>`;
                     });
                 });
-                if(errors.db) {
-                    const dber = errors.db;
-                    $(eventedForm).find(".comment-author").before(function () {
-                        return "<p class='bg-warning'>Слишком длинное поле</p>";
-                    });
-                }
-                submitButton.prop('disabled', false);
             },
             complete: function (response) {
-                
+                submitButton.prop('disabled', false);
             }
         });
     });

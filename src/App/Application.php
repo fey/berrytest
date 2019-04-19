@@ -4,6 +4,9 @@ namespace App;
 
 use function App\Renderer\render;
 use Db\Repository;
+use Db\PostManager;
+use Db\CommentManager;
+
 class Application
 {
     public $handlers = [];
@@ -12,8 +15,8 @@ class Application
     public function __construct()
     {
         // $app->postManager = new PostManager();
-        $this->articles = new Repository('articles');
-        $this->comments = new Repository('comments');
+        $this->articles = new PostManager('articles');
+        $this->comments = new CommentManager('comments');
     }
     public function run()
     {

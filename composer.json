@@ -14,11 +14,11 @@
             "": "src/"
         },
         "files": [
+            "src/config.php",
             "src/App/Response.php",
             "src/App/Renderer/Renderer.php",
             "src/App/Template/Template.php",
-            "src/utilities.php",
-            "src/config.php"
+            "src/utilities.php"
         ]
     },
     "require": {

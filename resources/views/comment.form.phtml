@@ -1,4 +1,4 @@
-<form class="answer-form" id="form-for-<?= isset($comment) ? $comment->getId() : '0'; ?>" role="form" method="POST" action="">
+<form class="answer-form" id="form-for-<?= isset($comment) ? $comment->getId() : '0'; ?>" role="form" method="POST" action="/comments">
     <div class="form-group"><label for="author">Имя Автора</label>
     <?php if (isset($errors['author'])): ?>
             имя автора не может быть пустым
@@ -15,5 +15,6 @@
         <textarea wrap="hard" name="comment[body]" class="form-control comment-body" rows="5" cols="100" autocomplete="off"><?= $formData['body'] ?? ''; ?></textarea>
     </div>
     <input id="parentId" name="comment[parent_id]" type="hidden" value="<?= isset($comment) ? $comment->getId() : '0'; ?>">
+    <input id="parentId" name="comment[article_id]" type="hidden" value="<?= $article->getId(); ?>">
     <button type="submit" class="btn btn-success">Submit</button>
 </form>

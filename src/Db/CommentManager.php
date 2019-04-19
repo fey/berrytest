@@ -4,12 +4,14 @@ namespace Db;
 
 class CommentManager
 {
-    private $articleId;
+    const FIELDS_NAME = [
+        'body'   => 'Комментарий',
+        'author' => "Имя автора"
+    ];
 
-    public function __construct($articleId)
+    public function __construct()
     {
         $this->repo = new Repository('comments');
-        $this->articleId = $articleId;
     }
 
     public function save($data)
@@ -19,7 +21,7 @@ class CommentManager
             'body' => str_replace(PHP_EOL, '</br>', $data['body']),
             'author' => $data['author'],
             'parent_id' => $data['parent_id'],
-            'article_id' => $this->articleId,
+            'article_id' => $data['article_id'],
         ];
 
         return $this->repo->insert($prepareData);
@@ -27,9 +29,13 @@ class CommentManager
 
     public function validate($data)
     {
-        return array_filter($this->sanitize($data), function ($item) {
+        $emptys = (array_filter($this->sanitize($data), function ($item) {
             return $item === '';
-        });
+        }));
+        return array_reduce(array_keys($emptys), function ($acc, $item) {
+            $acc[$item] = sprintf("%s не может быть пустым", self::FIELDS_NAME[$item]);
+            return $acc;
+        }, []);
     }
 
     public function sanitize($data)
@@ -37,15 +43,15 @@ class CommentManager
         return array_map('\Utilities\clean', $data);
     }
 
-    public function count()
+    public function count($articleId)
     {
-        return count($this->getComments());
+        return count($this->getComments($articleId));
     }
 
-    public function getComments()
+    public function getComments($articleId)
     {
-        $comments = array_filter($this->repo->all(), function ($item) {
-            return $item['article_id'] === $this->articleId;
+        $comments = array_filter($this->repo->all(), function ($item) use ($articleId) {
+            return $item['article_id'] === $articleId;
         });
 
         return array_map(function ($item) {
@@ -53,9 +59,9 @@ class CommentManager
         }, $comments);
     }
 
-    public function getTree()
+    public function getTree($articleId)
     {
-        $comments = \Utilities\buildTree($this->getComments());
+        $comments = \Utilities\buildTree($this->getComments($articleId));
 
         return $comments;
     }

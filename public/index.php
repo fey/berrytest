@@ -2,9 +2,9 @@
 
 namespace App;
 
-$autoloadPath1 = __DIR__.'/../../../autoload.php';
-$autoloadPath2 = __DIR__.'/../vendor/autoload.php';
-require_once (file_exists($autoloadPath1)) ? $autoloadPath1 : $autoloadPath2;
+$autoloadPath1 = __DIR__ . '/../../../autoload.php';
+$autoloadPath2 = __DIR__ . '/../vendor/autoload.php';
+require_once(file_exists($autoloadPath1)) ? $autoloadPath1 : $autoloadPath2;
 
 use function App\Renderer\render;
 
@@ -13,9 +13,9 @@ $app = new Application();
 $app->get('/', function () {
     $paginator = ['current' => 1, 'count' => $this->articles->count()];
     return response(render('index', [
-        'title' => 'Главная страница',
-        'articles' => $this->articles->getPage(1),
-        'pages' => $paginator,
+        'title'     => 'Главная страница',
+        'articles'  => $this->articles->getPage(1),
+        'pages'     => $paginator,
         ]));
 });
 $app->get('/new', function () {
@@ -28,9 +28,9 @@ $app->get('/page/:page', function ($request, $attributes) {
     }
     $paginator = ['current' => $attributes['page'], 'count' => $this->articles->count()];
     return response(render('index', [
-        'articles' => $this->articles->getPage($current),
-        'pages' => $paginator,
-        'title' => "Новости, страница {$current}",
+        'articles'  => $this->articles->getPage($current),
+        'pages'     => $paginator,
+        'title'     => "Новости, страница {$current}",
         ]));
 });
 
@@ -40,65 +40,53 @@ $app->get('/article/:id', function ($request, $attributes) {
     $article = $this->articles->getById($id);
 
     return response(render('show.article', [
-        'title' => $article->getTitle(),
-        'article' => $article,
-        'comments' => [],
-        'countComments' => 0,
+        'title'     => $article->getTitle(),
+        'article'   => $article,
+        'comments'  => $this->comments->getTree($id),
+        'countComments' => $this->comments->count($id),
         ]));
 });
-
 $app->post('/articles', function ($request) {
     $formData = $request->getQueryParam('article');
-    $this->articles->insert($formData);
-    return response()->redirect('/'); 
-    $this->articles->insert($formData);
-    $errors = $manager->validate($formData);
-    if (!empty($errors)) {
-        return response(render('new', [
-            'title' => 'Добавить новость',
-            'formData' => $formData,
-            'errors' => $errors, ]))->withStatus(400);
-    } else {
     $_SESSION['author'] = $formData['author'];
-    $this->articles->save($formData);
-    return response(render('new', [
-        'title' => 'Добавить новость',
-        'formData' => $formData,
-        'errors' => $errors,
-        ]))->withStatus(400);
+
+    /*
+    $errors = $this->articles->validate($formData);
+    if (!empty($errors)) {
+        return [];
+        return response(render('new', [
+            'title'     => 'Добавить новость',
+            'formData'  => $formData,
+            'errors'    => $errors, ]))->withStatus(400);
     }
-    return response()->redirect('/');
+     */
+    try {
+        $newId = $this->articles->save($formData);
+        return response()->redirect("/article/{$newId}");
+    } catch (\Throwable $th) {
+        return response(render('new', [
+            'title'     => 'Добавить новость',
+            'formData'  => $formData,
+            'errors'    => [$th->getMessage()],
+            ]))
+            ->withStatus(400);
+    }
 });
 
 // create Comment
-$app->post('/comments/:articleId/:parentId', function ($request, $attributes) {
-    $articleId = (int) $attributes['article'];
-    $parentId  = (int) $attributes['parentId'] ?: 0;
-    $article = $this->articles->getById($articleId);
+$app->post('/comments', function ($request) {
     $formData = $request->getQueryParam('comment');
-    // $errors = $commentManager->validate($formData);
+    $_SESSION['author'] = $formData['author'];
+    $errors = $this->comments->validate($formData);
     if ($errors) {
         return response(json_encode($errors))->withStatus(400);
-
-        return response(render('show.article', [
-            'title' => 'Добавить новость',
-            'formData' => $formData,
-            'errors' => $errors,
-            'article' => $article,
-            'comments' => $commentManager->getTree(),
-            'countComments' => 0,
-            ]));
     }
-        $_SESSION['author'] = $formData['author'];
-        $lastInsertId = $this->comments->save($formData);
 
-        return response(json_encode($errors))->withStatus(400);
+    $id = $this->comments->save($formData);
 
-    $newComment = json_encode($this->comments->getById($lastInsertId));
-
-    return ($request->getHeader('HTTP_X_REQUESTED_WITH')) 
-    ? response($newComment)
-    : response()->redirect("/article/{$attributes['id']}");
+    return $request->getHeader('X-Requested-With')
+    ? response(json_encode($this->comments->getById($id)))
+    : response()->redirect("/article/{$formData['article_id']}");
 });
 
 $app->run();
