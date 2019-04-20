@@ -1,11 +1,10 @@
-<?php 
-?>
-        <h4>Оставить комментарий:</h4>
-      <?php include 'comment.form.phtml'; ?>
-        <br><br>
+<h4>Оставить комментарий:</h4>
+<?php include 'comment.form.phtml'; ?>
+<br><br>
 
 <p><span class="badge countComments"><?= $countComments; ?></span> Comments:</p><br>
 <div class="comments" id="comment-0">
 
-<?php if (!empty($comments)): Utilities\echoComments($article, $comments); endif; ?>
+  <?php if (!empty($comments)) : Utilities\echoComments($article, $comments);
+  endif; ?>
 </div>

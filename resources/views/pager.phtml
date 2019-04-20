@@ -1,18 +1,17 @@
-<?php 
-use function Utilities\isPaged;
+<?php
+// use function Utilities\isPaged;
 
 ?>
- 
+
 <nav aria-label="...">
-      <ul class="pager">
-        <?php 
-if (isPaged($pages['current'], $pages['count'])): ?>
-          <li class="previous"><a href="/page/<?= $pages['current'] - 1; ?>">
+  <ul class="pager">
+    <?php if (Utilities\isPaged($pages['current'], $pages['count'])) : ?>
+      <li class="previous"><a href="/page/<?= $pages['current'] - 1; ?>">
           <span aria-hidden="true">&larr;</span> Newer</a></li>
-        <?php endif; ?>
-        <?php if (isPaged($pages['current'] + 1, $pages['count'])): ?>
-        <li class="next"><a href="/page/<?= $pages['current'] + 1; ?>">
-         Older<span aria-hidden="true">&rarr;</span></a></li>
-        <?php endif; ?>
-      </ul>
-    </nav>
+    <?php endif; ?>
+    <?php if (Utilities\isPaged($pages['current'] + 1, $pages['count'])) : ?>
+      <li class="next"><a href="/page/<?= $pages['current'] + 1; ?>">
+          Older<span aria-hidden="true">&rarr;</span></a></li>
+    <?php endif; ?>
+  </ul>
+</nav>
