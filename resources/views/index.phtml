@@ -5,7 +5,7 @@
 <?php endif; ?>
 <?php foreach ($articles as $article) : ?>
   <article>
-    <?php include 'article.template.phtml'; ?>
+    <?php include 'articles/article.template.phtml'; ?>
     <a href="/article/<?= $article->getId(); ?>">Читать далее</a>
     <hr>
   </article>
