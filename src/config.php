@@ -1,5 +1,4 @@
 <?php
-use function Utilities\getRootDir;
 
 const CONFIG_PATH = __DIR__ . '/../config.ini';
 if (file_exists(CONFIG_PATH) || (getenv('DATABASE_URL') === null)) {
