@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+
 use function App\Renderer\render;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -13,13 +14,13 @@ $app->get('/', function () {
         'title'     => 'Главная страница',
         'articles'  => $this->articles->getPage(1),
         'pages'     => $paginator,
-        ]));
+    ]));
 });
 $app->get('/new', function () {
     return response(render('articles/new', ['title' => 'Добавить новость']));
 });
 $app->get('/page/:page', function ($attributes) {
-    $current = (int) $attributes['page'];
+    $current = (int)$attributes['page'];
     if ($current < 2) {
         return response()->redirect('/');
     }
@@ -28,11 +29,10 @@ $app->get('/page/:page', function ($attributes) {
         'articles'  => $this->articles->getPage($current),
         'pages'     => $paginator,
         'title'     => "Новости, страница {$current}",
-        ]));
+    ]));
 });
 $app->get('/article/:id', function ($attributes) {
-    $id = (int) $attributes['id'];
-
+    $id = (int)$attributes['id'];
     $article = $this->articles->getById($id);
 
     return response(render('show.article', [
@@ -40,12 +40,12 @@ $app->get('/article/:id', function ($attributes) {
         'article'   => $article,
         'comments'  => $this->comments->getTree($id),
         'countComments' => $this->comments->count($id),
-        ]));
+    ]));
 });
+// @todo Add article validation
 $app->post('/articles', function () {
     $formData = $this->request->getQueryParam('article');
     $_SESSION['author'] = $formData['author'];
-
     /*
     $errors = $this->articles->validate($formData);
     if (!empty($errors)) {
@@ -64,10 +64,11 @@ $app->post('/articles', function () {
             'title'     => 'Добавить новость',
             'formData'  => $formData,
             'errors'    => [$th->getMessage()],
-            ]))
+        ]))
             ->withStatus(400);
     }
 });
+// @todo add comment validation
 $app->post('/comments', function () {
     $formData = $this->request->getQueryParam('comment');
     $_SESSION['author'] = $formData['author'];
@@ -79,8 +80,8 @@ $app->post('/comments', function () {
     $id = $this->comments->save($formData);
 
     return $this->request->getHeader('X-Requested-With')
-    ? response(json_encode($this->comments->getById($id)))
-    : response()->redirect("/article/{$formData['article_id']}");
+        ? response(json_encode($this->comments->getById($id)))
+        : response()->redirect("/article/{$formData['article_id']}");
 });
 
 $app->run();
