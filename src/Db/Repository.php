@@ -12,14 +12,15 @@ class Repository
     public function __construct($table)
     {
         $db = parse_url(getenv('DATABASE_URL'));
-        $this->pdo = new PDO('pgsql:'.sprintf(
-            'host=%s;port=%s;user=%s;password=%s;dbname=%s',
+        $this->pdo = new PDO(sprintf(
+            'pgsql:host=%s;port=%s;user=%s;password=%s;dbname=%s',
             $db['host'],
             $db['port'],
             $db['user'],
             $db['pass'],
             ltrim($db['path'], '/')
         ));
+
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         $this->pdo->setAttribute(PDO::ATTR_PERSISTENT, true);
@@ -86,15 +87,8 @@ class Repository
         return $pdo->exec("UPDATE {$this->table} SET {$values} WHERE {$whereColumn} = {$whereValue}");
     }
 
-    public function truncate($table)
+    public function getPdo()
     {
-        return $this->pdo->exec("TRUNCATE $table CASCADE");
-    }
-
-    public function setTable($table)
-    {
-        $this->table = $table;
-
-        return $this;
+        return $this->pdo;
     }
 }

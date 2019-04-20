@@ -2,134 +2,86 @@
 
 namespace App;
 
-$autoloadPath1 = __DIR__.'/../../../autoload.php';
-$autoloadPath2 = __DIR__.'/../vendor/autoload.php';
-if (file_exists($autoloadPath1)) {
-    require_once $autoloadPath1;
-} else {
-    require_once $autoloadPath2;
-}
 use function App\Renderer\render;
-use Db\Repository;
-use Db\PostManager;
-use Db\CommentManager;
+
+require_once __DIR__ . '/../vendor/autoload.php';
 
 $app = new Application();
 
-$articles = new Repository('articles');
-$comments = new Repository('comments');
-$sessid = session_id();
-$app->postManager = new PostManager();
-
-$app->get('/', function ($request, $attributes) {
-    $postManager = new PostManager();
-    $articlesPerPage = $postManager->getPage();
-
-    $pages = ['current' => 1, 'count' => $postManager->getCount()];
-
+$app->get('/', function () {
+    $paginator = ['current' => 1, 'count' => $this->articles->count()];
     return response(render('index', [
-        'title' => 'Главная страница',
-        'articles' => $articlesPerPage,
-        'pages' => $pages,
-        ]));
+        'title'     => 'Главная страница',
+        'articles'  => $this->articles->getPage(1),
+        'pages'     => $paginator,
+    ]));
 });
-$app->get('/page/:page', function ($request, $attributes) {
-    $page = (int) $attributes['page'];
-    if ($page < 2) {
+$app->get('/new', function () {
+    return response(render('articles/new', ['title' => 'Добавить новость']));
+});
+$app->get('/page/:page', function ($attributes) {
+    $current = (int)$attributes['page'];
+    if ($current < 2) {
         return response()->redirect('/');
     }
-    $postManager = new PostManager();
-    $articlesPerPage = $postManager->getPage($page);
-    $pages = ['current' => $attributes['page'], 'count' => $postManager->getCount()];
-
+    $paginator = ['current' => $attributes['page'], 'count' => $this->articles->count()];
     return response(render('index', [
-        'articles' => $articlesPerPage,
-        'pages' => $pages,
-        'title' => "Новости, страница {$page}",
-        ]));
+        'articles'  => $this->articles->getPage($current),
+        'pages'     => $paginator,
+        'title'     => "Новости, страница {$current}",
+    ]));
 });
-$app->get('/new', function ($request) {
-    return response(render('new', ['title' => 'Добавить новость']));
-});
-$app->post('/articles', function ($request) use ($articles) {
-    $formData = $request->getQueryParam('article');
-    $manager = new PostManager();
-    $errors = $manager->validate($formData);
-    if (!empty($errors)) {
-        return response(render('new', [
-            'title' => 'Добавить новость',
-            'formData' => $formData,
-            'errors' => $errors, ]))->withStatus(400);
-    }
-    try {
-        $_SESSION['author'] = $formData['author'];
-        $manager->save($formData);
-    } catch (\PDOException $e) {
-        if ($e->getCode() === '22001') {
-            $errors['db'] = 'Поля слишком длинные';
-        }
-        return response(render('new', [
-            'title' => 'Добавить новость',
-            'formData' => $formData,
-            'errors' => $errors,
-            ]))->withStatus(400);
-
-        return response($e->getMessage());
-    }
-
-    return response()->redirect('/');
-});
-
-$app->post('/article/:id', function ($request, $attributes) {
-    $id = (int) $attributes['id'];
-    $commentManager = new CommentManager($id);
-    $postManager = new PostManager();
-    $article = $postManager->getById($id);
-    $formData = $commentManager->sanitize($request->getQueryParam('comment'));
-    $errors = $commentManager->validate($formData);
-    if ($errors) {
-        return response(json_encode($errors))->withStatus(400);
-
-        return response(render('show.article', [
-            'title' => 'Добавить новость',
-            'formData' => $formData,
-            'errors' => $errors,
-            'article' => $article,
-            'comments' => $commentManager->getTree(),
-            'countComments' => 0,
-            ]));
-    }
-    try {
-        $_SESSION['author'] = $formData['author'];
-        $lastInsertId = $commentManager->save($formData);
-    } catch (\PDOException $e) {
-        $errors['db'] = $e->getMessage();
-        return response(json_encode($errors))->withStatus(400);
-    }
-
-    $newComment = json_encode($commentManager->getById($lastInsertId));
-
-    return ($request->getHeader('HTTP_X_REQUESTED_WITH')) ? response($newComment) :
-    response()->redirect("/article/{$attributes['id']}");
-});
-
-$app->get('/article/:id', function ($request, $attributes) {
-    $id = (int) $attributes['id'];
-    $postManager = new PostManager();
-    $commentManager = new CommentManager($id);
-    $article = $postManager->getById($id);
+$app->get('/article/:id', function ($attributes) {
+    $id = (int)$attributes['id'];
+    $article = $this->articles->getById($id);
 
     return response(render('show.article', [
-        'title' => $article->getTitle(),
-        'article' => $article,
-        'comments' => $commentManager->getTree(),
-        'countComments' => $commentManager->count(),
-        ]));
+        'title'     => $article->getTitle(),
+        'article'   => $article,
+        'comments'  => $this->comments->getTree($id),
+        'countComments' => $this->comments->count($id),
+    ]));
+});
+// @todo Add article validation
+$app->post('/articles', function () {
+    $formData = $this->request->getQueryParam('article');
+    $_SESSION['author'] = $formData['author'];
+    /*
+    $errors = $this->articles->validate($formData);
+    if (!empty($errors)) {
+        return [];
+        return response(render('new', [
+            'title'     => 'Добавить новость',
+            'formData'  => $formData,
+            'errors'    => $errors, ]))->withStatus(400);
+    }
+     */
+    try {
+        $newId = $this->articles->save($formData);
+        return response()->redirect("/article/{$newId}");
+    } catch (\Throwable $th) {
+        return response(render('articles/new', [
+            'title'     => 'Добавить новость',
+            'formData'  => $formData,
+            'errors'    => [$th->getMessage()],
+        ]))
+            ->withStatus(400);
+    }
+});
+// @todo add comment validation
+$app->post('/comments', function () {
+    $formData = $this->request->getQueryParam('comment');
+    $_SESSION['author'] = $formData['author'];
+    $errors = $this->comments->validate($formData);
+    if ($errors) {
+        return response(json_encode($errors))->withStatus(400);
+    }
+
+    $id = $this->comments->save($formData);
+
+    return $this->request->getHeader('X-Requested-With')
+        ? response(json_encode($this->comments->getById($id)))
+        : response()->redirect("/article/{$formData['article_id']}");
 });
 
-$app->delete('/articles', function ($request) use ($articles) {
-    $articles->truncate('articles');
-
-    return response()->redirect('/');
-});
 $app->run();

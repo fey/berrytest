@@ -4,8 +4,9 @@ REQUIREMENTS
 * POSTGRESQL 9+
 
 **HOW TO**
-1. FORK OR CLONE
-2. `composer install`!
-3. execute `./db/berry.sql`
-4. ??????
-5. PROFIT
+
+1. Fork or clone
+3. set `DATABASE URL` in config.ini
+2. `make install`!
+5. ??????
+6. PROFIT

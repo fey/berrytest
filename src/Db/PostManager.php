@@ -30,7 +30,7 @@ class PostManager
         return $result;
     }
 
-    public function getPage($page = 1)
+    public function getPage($page)
     {
         $data = $this->repo->getPage($page);
         $result = [];
@@ -51,7 +51,7 @@ class PostManager
         $data = $this->sanitize($data);
         $prepareData = [
             'description' => $data['description'],
-            'text' => str_replace(PHP_EOL, '</br>', $data['text']),
+            'body' => str_replace(PHP_EOL, '</br>', $data['body']),
             'title' => $data['title'],
             'author' => $data['author'],
         ];
@@ -71,7 +71,7 @@ class PostManager
         });
     }
 
-    public function getCount()
+    public function count()
     {
         return $this->repo->count();
     }

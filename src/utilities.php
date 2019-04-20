@@ -87,13 +87,18 @@ function buildTree($flat)
 
     return $tree;
 }
-function echoComments($comments, $parent = 0)
+function echoComments($article, $comments, $parent = 0)
 {
     foreach ($comments as $comment) {
         include '../resources/views/comment.phtml';
         if ($comment->getChildren()) {
-            echoComments($comment->getChildren(), $parent + 1);
+            echoComments($article, $comment->getChildren(), $parent + 1);
         }
         echo '</div>';
     }
+}
+
+function getRootDir()
+{
+    return dirname($_SERVER['DOCUMENT_ROOT']);
 }

@@ -31,7 +31,7 @@ class Post
 
     public function getTextbody()
     {
-        return $this->fields['text'];
+        return $this->fields['body'];
     }
 
     public function getTitle()

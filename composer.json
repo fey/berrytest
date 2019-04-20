@@ -14,6 +14,7 @@
             "": "src/"
         },
         "files": [
+            "src/config.php",
             "src/App/Response.php",
             "src/App/Renderer/Renderer.php",
             "src/App/Template/Template.php",

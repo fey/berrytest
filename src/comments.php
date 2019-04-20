@@ -84,7 +84,7 @@
         $printTab = str_repeat("\t", $parent);
 
         foreach ($comments as $comment) {
-            echo $printTab.'comment text with id'.$comment['id'].PHP_EOL;
+            echo $printTab . 'comment text with id' . $comment['id'] . PHP_EOL;
             if (isset($comment['children'])) {
                 echoComments($comment['children'], $parent + 1);
             }

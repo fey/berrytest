@@ -1,8 +1,8 @@
 <div id="comment-<?= $comment->getId() ?? 0; ?>" class="col-sm-12 comment">
-    <h4> <?= $comment->getAuthor() ?? 'Анонимно'; ?> <small><?= $comment->getCreatedAt() ?? 'Дата неизвестна'; ?></small></h4>
-    <p>
-        <?= $comment->getTextbody() ?? '<i>Комментарий скрыт</i>'; ?>
-    </p>
-    <a class="answer" href="#comment-<?= $comment->getId() ?? '0'; ?>">Answer</a>
-    <?php include 'comment.form.phtml'; ?>
-    <br>
+  <h4> <?= $comment->getAuthor() ?? 'Анонимно'; ?> <small><?= $comment->getCreatedAt() ?? 'Дата неизвестна'; ?></small></h4>
+  <p>
+    <?= $comment->getTextbody() ?? '<i>Комментарий скрыт</i>'; ?>
+  </p>
+  <a class="answer" href="#comment-<?= $comment->getId() ?? '0'; ?>">Answer</a>
+  <?php include 'comment.form.phtml'; ?>
+  <br>

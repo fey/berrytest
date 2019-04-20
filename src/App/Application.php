@@ -3,12 +3,21 @@
 namespace App;
 
 use function App\Renderer\render;
+use Db\Repository;
+use Db\PostManager;
+use Db\CommentManager;
 
 class Application
 {
     public $handlers = [];
     public $request;
 
+    public function __construct()
+    {
+        // $app->postManager = new PostManager();
+        $this->articles = new PostManager('articles');
+        $this->comments = new CommentManager('comments');
+    }
     public function run()
     {
         $session = new Session();
@@ -20,8 +29,8 @@ class Application
 
         if (!empty($this->getHandlerItem())) {
             [$preparedRoute, $handlerMethod, $handler, $attributes] = $this->getHandlerItem();
-
-            $response = $handler($this->request, $attributes);
+            $handler = $handler->bindTo($this);
+            $response = $handler($attributes);
             $response->sendResponseCode()->sendHeaders();
             echo $response->getBody();
         } else {
