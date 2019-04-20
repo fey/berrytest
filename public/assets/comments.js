@@ -29,7 +29,7 @@ $(document).ready(function () {
         });
       },
       error: function (response) {
-        $.each(this.parseJSON(response.responseText), function (index, item) {
+        $.each($.parseJSON(response.responseText), function (index, item) {
           $(eventedForm).find(".comment-" + index).before(function () {
             return `<p class='bg-warning'>Поле ${item} </p>`;
           });
