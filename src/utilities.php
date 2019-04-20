@@ -90,7 +90,7 @@ function buildTree($flat)
 function echoComments($article, $comments, $parent = 0)
 {
     foreach ($comments as $comment) {
-        include '../resources/views/comment.phtml';
+        include getRootDir() . '/resources/views/articles/comment.phtml';
         if ($comment->getChildren()) {
             echoComments($article, $comment->getChildren(), $parent + 1);
         }

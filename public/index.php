@@ -35,7 +35,7 @@ $app->get('/article/:id', function ($attributes) {
     $id = (int)$attributes['id'];
     $article = $this->articles->getById($id);
 
-    return response(render('show.article', [
+    return response(render('articles/show', [
         'title'     => $article->getTitle(),
         'article'   => $article,
         'comments'  => $this->comments->getTree($id),
