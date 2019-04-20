@@ -1,12 +1,9 @@
 <?php
 
 namespace App;
-
-$autoloadPath1 = __DIR__ . '/../../../autoload.php';
-$autoloadPath2 = __DIR__ . '/../vendor/autoload.php';
-require_once(file_exists($autoloadPath1)) ? $autoloadPath1 : $autoloadPath2;
-
 use function App\Renderer\render;
+
+require_once __DIR__ . '/../vendor/autoload.php';
 
 $app = new Application();
 
@@ -19,9 +16,9 @@ $app->get('/', function () {
         ]));
 });
 $app->get('/new', function () {
-    return response(render('new', ['title' => 'Добавить новость']));
+    return response(render('articles/new', ['title' => 'Добавить новость']));
 });
-$app->get('/page/:page', function ($request, $attributes) {
+$app->get('/page/:page', function ($attributes) {
     $current = (int) $attributes['page'];
     if ($current < 2) {
         return response()->redirect('/');
@@ -33,8 +30,7 @@ $app->get('/page/:page', function ($request, $attributes) {
         'title'     => "Новости, страница {$current}",
         ]));
 });
-
-$app->get('/article/:id', function ($request, $attributes) {
+$app->get('/article/:id', function ($attributes) {
     $id = (int) $attributes['id'];
 
     $article = $this->articles->getById($id);
@@ -46,8 +42,8 @@ $app->get('/article/:id', function ($request, $attributes) {
         'countComments' => $this->comments->count($id),
         ]));
 });
-$app->post('/articles', function ($request) {
-    $formData = $request->getQueryParam('article');
+$app->post('/articles', function () {
+    $formData = $this->request->getQueryParam('article');
     $_SESSION['author'] = $formData['author'];
 
     /*
@@ -64,7 +60,7 @@ $app->post('/articles', function ($request) {
         $newId = $this->articles->save($formData);
         return response()->redirect("/article/{$newId}");
     } catch (\Throwable $th) {
-        return response(render('new', [
+        return response(render('articles/new', [
             'title'     => 'Добавить новость',
             'formData'  => $formData,
             'errors'    => [$th->getMessage()],
@@ -72,10 +68,8 @@ $app->post('/articles', function ($request) {
             ->withStatus(400);
     }
 });
-
-// create Comment
-$app->post('/comments', function ($request) {
-    $formData = $request->getQueryParam('comment');
+$app->post('/comments', function () {
+    $formData = $this->request->getQueryParam('comment');
     $_SESSION['author'] = $formData['author'];
     $errors = $this->comments->validate($formData);
     if ($errors) {
@@ -84,7 +78,7 @@ $app->post('/comments', function ($request) {
 
     $id = $this->comments->save($formData);
 
-    return $request->getHeader('X-Requested-With')
+    return $this->request->getHeader('X-Requested-With')
     ? response(json_encode($this->comments->getById($id)))
     : response()->redirect("/article/{$formData['article_id']}");
 });

@@ -97,3 +97,8 @@ function echoComments($article, $comments, $parent = 0)
         echo '</div>';
     }
 }
+
+function getRootDir()
+{
+    return dirname($_SERVER['DOCUMENT_ROOT']);
+}

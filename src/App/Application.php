@@ -30,7 +30,7 @@ class Application
         if (!empty($this->getHandlerItem())) {
             [$preparedRoute, $handlerMethod, $handler, $attributes] = $this->getHandlerItem();
             $handler = $handler->bindTo($this);
-            $response = $handler($this->request, $attributes);
+            $response = $handler($attributes);
             $response->sendResponseCode()->sendHeaders();
             echo $response->getBody();
         } else {

@@ -1,16 +1,13 @@
-<?php include 'common/head.phtml'; ?>
+
 <?php include 'pager.phtml'; ?>
 <?php if (empty($articles)) : ?>
   <h1>Не создано ни одной новости</h1>
 <?php endif; ?>
 <?php foreach ($articles as $article) : ?>
   <article>
-    <?php include 'article.phtml'; ?>
+    <?php include 'article.template.phtml'; ?>
     <a href="/article/<?= $article->getId(); ?>">Читать далее</a>
     <hr>
   </article>
 <?php endforeach; ?>
-
-</div>
 <?php include 'pager.phtml'; ?>
-<?php include 'common/foot.phtml'; ?>
