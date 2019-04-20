@@ -57,16 +57,17 @@ class Request
     public function getAllHeaders()
     {
         if (!function_exists('getallheaders')) {
-            $headers = $this->getHeaders();
-            foreach ($_SERVER as $name => $value) {
-                if (substr($name, 0, 5) == 'HTTP_') {
-                    $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-                }
-            }
-
-            return $headers;
-        } else {
             return \getallheaders();
+        } else {
+            
         }
+        $headers = $this->getHeaders();
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+
+        return $headers;
     }
 }
