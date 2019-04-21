@@ -21,11 +21,11 @@ $(document).ready(function () {
       success: function (response) {
         const newComment = $.parseJSON(response);
         $.get('', function (data) {
-          const counter = $(data).find('.countComments');
           $('#comment-' + newComment['parent_id']).append($(data).find('#comment-' + newComment['id']));
           $('.countComments').text($(data).find('.countComments').text());
           $(eventedForm).find("textarea").val("");
           $('.comment > .answer-form').hide();
+          $('html, body').animate( { scrollTop: $("#comment-" + newComment['id']).offset().top });
         });
       },
       error: function (response) {
