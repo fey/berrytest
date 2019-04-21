@@ -56,10 +56,8 @@ class Request
 
     public function getAllHeaders()
     {
-        if (!function_exists('getallheaders')) {
+        if (function_exists('getallheaders')) {
             return \getallheaders();
-        } else {
-            
         }
         $headers = $this->getHeaders();
         foreach ($_SERVER as $name => $value) {

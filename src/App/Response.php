@@ -36,7 +36,7 @@ class Response implements ResponseInterface
     {
         switch ($format) {
             case 'json':
-                $this->headers['Content-Type'] = 'json';
+                $this->headers['Content-Type'] = 'application/json';
                 $this->body = json_encode($this->body);
                 $this->headers['Content-Length'] = mb_strlen($this->body);
         }
