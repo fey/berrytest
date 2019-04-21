@@ -87,12 +87,12 @@ function buildTree($flat)
 
     return $tree;
 }
-function echoComments($article, $comments, $parent = 0)
+function echoComments($article, $author, $comments, $parent = 0)
 {
     foreach ($comments as $comment) {
         include getRootDir() . '/resources/views/articles/comment.phtml';
         if ($comment->getChildren()) {
-            echoComments($article, $comment->getChildren(), $parent + 1);
+            echoComments($article, $author, $comment->getChildren(), $parent + 1);
         }
         echo '</div>';
     }

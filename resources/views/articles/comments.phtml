@@ -5,6 +5,6 @@
 <p><span class="badge countComments"><?= $countComments; ?></span> Comments:</p><br>
 <div class="comments" id="comment-0">
 
-  <?php if (!empty($comments)) : Utilities\echoComments($article, $comments);
+  <?php if (!empty($comments)) : Utilities\echoComments($article, $author, $comments);
   endif; ?>
 </div>

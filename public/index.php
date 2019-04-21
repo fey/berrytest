@@ -17,7 +17,11 @@ $app->get('/', function () {
     ]));
 });
 $app->get('/new', function () {
-    return response(render('articles/new', ['title' => 'Добавить новость']));
+    return response(render('articles/new', [
+        'title'  => 'Добавить новость',
+        'errors' => [],
+        'author' => $this->session->get('author')
+    ]));
 });
 $app->get('/page/:page', function ($attributes) {
     $current = (int)$attributes['page'];
@@ -35,53 +39,63 @@ $app->get('/article/:id', function ($attributes) {
     $id = (int)$attributes['id'];
     $article = $this->articles->getById($id);
 
-    return response(render('articles/show', [   
-        'title'     => $article->getTitle(),
-        'article'   => $article,
-        'comments'  => $this->comments->getTree($id),
+    return response(render('articles/show', [
+        'title'         => $article->getTitle(),
+        'article'       => $article,
+        'author'        => $this->session->get('author'),
+        'comments'      => $this->comments->getTree($id),
         'countComments' => $this->comments->count($id),
+        'errors'        => []
     ]));
 });
-// @todo Add article validation
+
 $app->post('/articles', function () {
     $formData = $this->request->getQueryParam('article');
-    $_SESSION['author'] = $formData['author'];
-    /*
+    $this->session->set('author', $formData['author']);
     $errors = $this->articles->validate($formData);
     if (!empty($errors)) {
-        return [];
-        return response(render('new', [
+        return response(render('articles/new', [
             'title'     => 'Добавить новость',
             'formData'  => $formData,
-            'errors'    => $errors, ]))->withStatus(400);
+            'errors'    => $errors
+        ]))->withStatus(400);
     }
-     */
     try {
         $newId = $this->articles->save($formData);
         return response()->redirect("/article/{$newId}");
     } catch (\Throwable $th) {
+        error_log($th->getMessage(), 4);
         return response(render('articles/new', [
             'title'     => 'Добавить новость',
             'formData'  => $formData,
-            'errors'    => [$th->getMessage()],
-        ]))
-            ->withStatus(400);
+            'errors'    => ['db' => "Произошла ошибка соединения с базой"],
+        ]))->withStatus(400);
     }
 });
-// @todo add comment validation
+
 $app->post('/comments', function () {
     $formData = $this->request->getQueryParam('comment');
-    $_SESSION['author'] = $formData['author'];
-    $errors = $this->comments->validate($formData);
+    $article  = $this->articles->getById((int)$formData['article_id']);
+    $withAjax = (bool)$this->request->getHeader('X-Requested-With');
+    $errors   = $this->comments->validate($formData);
+    $this->session->set('author', $formData['author']);
+
     if ($errors) {
-        return response(json_encode($errors))->withStatus(400);
+        return ($withAjax)
+            ? response($errors)->format('json')->withStatus(400)
+            : response(render('articles/show', [
+                'title'         => $article->getTitle(),
+                'article'       => $article,
+                'author'        => $this->session->get('author'),
+                'comments'      => $this->comments->getTree($article->getId()),
+                'countComments' => $this->comments->count($article->getId()),
+                'errors'        => $errors
+            ]));
     }
-
     $id = $this->comments->save($formData);
-
-    return $this->request->getHeader('X-Requested-With')
-        ? response(json_encode($this->comments->getById($id)))
-        : response()->redirect("/article/{$formData['article_id']}");
+    return ($withAjax)
+        ? response($this->comments->getById($id))->format('json')
+        : response()->redirect(sprintf("/article/%s#comment-%s", $formData['article_id'], $id));
 });
 
 $app->run();

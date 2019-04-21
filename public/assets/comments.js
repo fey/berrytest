@@ -16,7 +16,7 @@ $(document).ready(function () {
       data: formData,
       dataType: "text",
       beforeSend: function (response) {
-        $(".bg-warning").remove();
+        $(".alert-danger").remove();
       },
       success: function (response) {
         const newComment = $.parseJSON(response);
@@ -31,7 +31,7 @@ $(document).ready(function () {
       error: function (response) {
         $.each($.parseJSON(response.responseText), function (index, item) {
           $(eventedForm).find(".comment-" + index).before(function () {
-            return `<p class='bg-warning'>Поле ${item} </p>`;
+            return `<p class='alert alert-danger'>Поле ${item} </p>`;
           });
         });
       },

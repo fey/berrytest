@@ -8,6 +8,13 @@ class PostManager
 {
     private $repo;
     private $posts;
+    const FIELDS_NAME = [
+        'body' => "Текст статьи",
+        'title' => "Заголовок",
+        'author' => "Имя Автора",
+        'description' => "Описание",
+    ];
+    const VARCHAR_LIMIT = 255;
 
     public function __construct()
     {
@@ -66,11 +73,41 @@ class PostManager
 
     public function validate($data)
     {
-        return array_filter($this->sanitize($data), function ($item) {
-            return empty($item);
-        });
+        $sanitized = $this->sanitize($data);
+        $errors = array_merge($this->checkEmpty($sanitized), $this->checkLong($sanitized));
+        return $errors;
     }
 
+    private function checkEmpty($data)
+    {
+        $emptys = array_filter($this->sanitize($data), function ($item) {
+            return $item === '';
+        });
+        return array_reduce(array_keys($emptys), function ($acc, $item) {
+            $acc[$item] = sprintf(
+                "Поле %s не может быть пустым",
+                self::FIELDS_NAME[$item]
+            );
+            return $acc;
+        }, []);
+    }
+    private function checkLong($data)
+    {
+        $limitedKeys = array_intersect_key($data, array_flip(['author', 'title', 'description']));
+        $longs = array_filter($limitedKeys, function ($item) {
+            return (mb_strlen($item) > self::VARCHAR_LIMIT);
+        });
+        $acc = array_reduce(array_keys($longs), function ($acc, $item) {
+            $acc[$item] = sprintf(
+                "Длина поля %s не может быть больше %s", 
+                self::FIELDS_NAME[$item], 
+                self::VARCHAR_LIMIT
+            );
+            return $acc;
+        }, []);
+
+        return $acc;
+    }
     public function count()
     {
         return $this->repo->count();
