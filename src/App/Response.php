@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+use function \mb_strlen;
 
 function response($body = null)
 {
